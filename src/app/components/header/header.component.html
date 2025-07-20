@@ -1,0 +1,81 @@
+<nav class="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <div class="flex-shrink-0">
+            <a routerLink="/" class="text-2xl font-bold text-primary">
+              Chronos
+            </a>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-8">
+              <a routerLink="/" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}" 
+                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                Home
+              </a>
+              <a routerLink="/products" routerLinkActive="text-primary" 
+                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                Products
+              </a>
+              <a routerLink="/contact" routerLinkActive="text-primary" 
+                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                Contact
+              </a>
+            </div>
+          </div>
+
+          <!-- Right side buttons -->
+          <div class="flex items-center space-x-4">
+            <!-- Theme Toggle -->
+            <button
+              (click)="themeService.toggleTheme()"
+              class="p-2 rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+              [attr.aria-label]="(isDarkMode$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
+            >
+              <ng-icon [name]="(isDarkMode$ | async) ? 'ionSunny' : 'ionMoon'" class="w-5 h-5"></ng-icon>
+            </button>
+
+            <!-- Cart -->
+            <a routerLink="/cart" class="relative p-2 rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+              <ng-icon name="ionCart" class="w-5 h-5"></ng-icon>
+              <span *ngIf="cartCount > 0" 
+                    class="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {{ cartCount }}
+              </span>
+            </a>
+
+            <!-- Mobile menu button -->
+            <button
+              (click)="toggleMobileMenu()"
+              class="md:hidden p-2 rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              <ng-icon [name]="isMobileMenuOpen ? 'heroXMark' : 'ionMenu'" class="w-5 h-5"></ng-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div *ngIf="isMobileMenuOpen" class="md:hidden border-t border-border">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <a routerLink="/" routerLinkActive="bg-accent text-accent-foreground" [routerLinkActiveOptions]="{exact: true}"
+               (click)="closeMobileMenu()"
+               class="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+              Home
+            </a>
+            <a routerLink="/products" routerLinkActive="bg-accent text-accent-foreground"
+               (click)="closeMobileMenu()"
+               class="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+              Products
+            </a>
+            <a routerLink="/contact" routerLinkActive="bg-accent text-accent-foreground"
+               (click)="closeMobileMenu()"
+               class="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+              Contact
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>

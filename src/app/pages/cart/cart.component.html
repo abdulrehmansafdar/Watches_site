@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-muted/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center mb-8">
+          <a routerLink="/products" class="flex items-center text-muted-foreground hover:text-foreground mr-4 transition-colors">
+            <ng-icon name="ionArrowBack" class="mr-2 w-5 h-5"></ng-icon>
+            Continue Shopping
+          </a>
+          <h1 class="text-3xl font-light text-foreground">Shopping Cart</h1>
+        </div>
+
+        <!-- Empty Cart -->
+        <div *ngIf="cartItems.length === 0" class="text-center py-16">
+          <ng-icon name="ionBag" class="w-24 h-24 mx-auto text-muted-foreground mb-8"></ng-icon>
+          <h1 class="text-3xl font-light text-foreground mb-4">Your cart is empty</h1>
+          <p class="text-lg text-muted-foreground mb-8">Discover our collection of exceptional timepieces</p>
+          <a routerLink="/products" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8">
+            Continue Shopping
+          </a>
+        </div>
+
+        <!-- Cart Content -->
+        <div *ngIf="cartItems.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Cart Items -->
+          <div class="lg:col-span-2 space-y-4">
+            <ui-card *ngFor="let item of cartItems" class="hover:shadow-md transition-shadow">
+              <ui-card-content class="p-6">
+                <div class="flex items-center space-x-4">
+                  <div class="relative w-24 h-24 flex-shrink-0">
+                    <img
+                      [src]="item.image"
+                      [alt]="item.name"
+                      class="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-semibold text-foreground mb-1">{{ item.name }}</h3>
+                    <span class="inline-block bg-muted text-muted-foreground px-2 py-1 text-sm rounded mb-2">
+                      {{ item.category }}
+                    </span>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xl font-bold text-foreground">\${{ item.price }}</span>
+                      <span *ngIf="item.originalPrice" class="text-sm text-muted-foreground line-through">
+                        \${{ item.originalPrice }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-3">
+                    <div class="flex items-center border border-border rounded-md">
+                      <button (click)="updateQuantity(item.id, item.quantity - 1)" [disabled]="item.quantity <= 1" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                        <ng-icon name="heroMinus" class="w-4 h-4"></ng-icon>
+                      </button>
+                      <span class="px-3 py-1 text-center min-w-[2rem]">{{ item.quantity }}</span>
+                      <button (click)="updateQuantity(item.id, item.quantity + 1)" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                        <ng-icon name="ionAdd" class="w-4 h-4"></ng-icon>
+                      </button>
+                    </div>
+
+                    <button (click)="removeItem(item.id)" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                      <ng-icon name="heroXMark" class="w-4 h-4 text-destructive"></ng-icon>
+                    </button>
+                  </div>
+                </div>
+              </ui-card-content>
+            </ui-card>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="lg:col-span-1">
+            <ui-card class="sticky top-8">
+              <ui-card-content class="p-6">
+                <h2 class="text-xl font-semibold text-foreground mb-6">Order Summary</h2>
+
+                <div class="space-y-4 mb-6">
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground">Subtotal</span>
+                    <span class="font-medium">\${{ subtotal.toFixed(2) }}</span>
+                  </div>
+
+                  <div *ngIf="savings > 0" class="flex justify-between text-green-600">
+                    <span>Savings</span>
+                    <span>-\${{ savings.toFixed(2) }}</span>
+                  </div>
+
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground">Shipping</span>
+                    <span class="font-medium">{{ shipping === 0 ? 'Free' : '$' + shipping.toFixed(2) }}</span>
+                  </div>
+
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground">Tax</span>
+                    <span class="font-medium">\${{ tax.toFixed(2) }}</span>
+                  </div>
+
+                  <hr class="border-border">
+
+                  <div class="flex justify-between text-lg font-semibold">
+                    <span>Total</span>
+                    <span>\${{ total.toFixed(2) }}</span>
+                  </div>
+                </div>
+
+                <!-- Promo Code -->
+                <div class="mb-6">
+                  <div class="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Promo code"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
+                      [(ngModel)]="promoCode"
+                    />
+                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                      Apply
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Checkout Button -->
+                <a routerLink="/checkout" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full mb-4">
+                  Proceed to Checkout
+                </a>
+
+                <!-- Trust Badges -->
+                <div class="space-y-3 pt-4 border-t border-border">
+                  <div class="flex items-center text-sm text-muted-foreground">
+                    <ng-icon name="ionShieldOutline" class="mr-2 w-4 h-4 text-green-600"></ng-icon>
+                    Secure checkout with SSL encryption
+                  </div>
+                  <div class="flex items-center text-sm text-muted-foreground">
+                    <ng-icon name="featherTruck" class="mr-2 w-4 h-4 text-blue-600"></ng-icon>
+                    Free shipping on orders over $500
+                  </div>
+                </div>
+              </ui-card-content>
+            </ui-card>
+          </div>
+        </div>
+      </div>
+    </div>

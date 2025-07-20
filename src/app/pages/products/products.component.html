@@ -1,0 +1,279 @@
+<div class="min-h-screen bg-background">
+      <!-- Header -->
+      <div class="bg-muted/50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 class="text-4xl font-light text-foreground mb-4">All Timepieces</h1>
+          <p class="text-lg text-muted-foreground">Discover our complete collection of meticulously crafted watches</p>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Desktop Sidebar -->
+          <div class="hidden lg:block w-64 flex-shrink-0">
+            <div class="sticky top-24 space-y-6">
+              <!-- Search -->
+              <div class="relative">
+                <ng-icon name="heroMagnifyingGlass" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"></ng-icon>
+                <input
+                  type="text"
+                  placeholder="Search watches..."
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
+                  [(ngModel)]="searchQuery"
+                  (ngModelChange)="filterProducts()"
+                />
+              </div>
+
+              <!-- Price Range -->
+              <div>
+                <h3 class="text-lg font-semibold mb-4">Price Range</h3>
+                <div class="space-y-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="2000"
+                    step="50"
+                    [(ngModel)]="priceRange[0]"
+                    (ngModelChange)="filterProducts()"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="2000"
+                    step="50"
+                    [(ngModel)]="priceRange[1]"
+                    (ngModelChange)="filterProducts()"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div class="flex justify-between text-sm text-muted-foreground">
+                    <span>\${{ priceRange[0] }}</span>
+                    <span>\${{ priceRange[1] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Categories -->
+              <div>
+                <h3 class="text-lg font-semibold mb-4">Category</h3>
+                <div class="space-y-2">
+                  <label *ngFor="let category of categories" class="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="selectedCategories[category]"
+                      (ngModelChange)="filterProducts()"
+                      class="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span class="text-sm">{{ category }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Materials -->
+              <div>
+                <h3 class="text-lg font-semibold mb-4">Material</h3>
+                <div class="space-y-2">
+                  <label *ngFor="let material of materials" class="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="selectedMaterials[material]"
+                      (ngModelChange)="filterProducts()"
+                      class="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span class="text-sm">{{ material }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="flex-1">
+            <!-- Controls -->
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center space-x-4">
+                <button (click)="toggleFilters()" class="lg:hidden inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                  <ng-icon name="ionFilter" class="w-4 h-4 mr-2"></ng-icon>
+                  Filters
+                </button>
+                <span class="text-sm text-muted-foreground">{{ filteredProducts.length }} products</span>
+              </div>
+
+              <div class="flex items-center space-x-4">
+                <select [(ngModel)]="sortBy" (ngModelChange)="sortProducts()" class="border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+
+                <div class="flex border border-border rounded-md">
+                  <button
+                    [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'grid' ? 'bg-accent' : '')"
+                    (click)="viewMode = 'grid'"
+                  >
+                    <ng-icon name="ionGridOutline" class="w-4 h-4"></ng-icon>
+                  </button>
+                  <button
+                    [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'list' ? 'bg-accent' : '')"
+                    (click)="viewMode = 'list'"
+                  >
+                    <ng-icon name="ionList" class="w-4 h-4"></ng-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div [class]="viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'">
+              <ui-card
+                *ngFor="let product of filteredProducts"
+                [class]="'group cursor-pointer hover:shadow-xl transition-all duration-300 ' + (viewMode === 'list' ? 'flex flex-row' : '')"
+              >
+                <div [class]="'relative overflow-hidden ' + (viewMode === 'list' ? 'w-48 flex-shrink-0' : '')">
+                  <img
+                    [src]="product.image"
+                    [alt]="product.name"
+                    [class]="'object-cover group-hover:scale-105 transition-transform duration-500 ' + 
+                             (viewMode === 'list' ? 'w-48 h-48' : 'w-full h-80')"
+                  />
+                  <div *ngIf="product.badge" class="absolute top-4 left-4 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
+                    {{ product.badge }}
+                  </div>
+                  <button class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-10">
+                    <ng-icon name="ionHeart" class="w-4 h-4"></ng-icon>
+                  </button>
+                </div>
+                
+                <ui-card-content [class]="'p-6 ' + (viewMode === 'list' ? 'flex-1' : '')">
+                  <div class="flex items-center mb-2">
+                    <div class="flex items-center">
+                      <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-4 h-4 text-yellow-400 fill-current"></ng-icon>
+                      <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-4 h-4 text-gray-300"></ng-icon>
+                    </div>
+                    <span class="text-sm text-muted-foreground ml-2">({{ product.reviews }})</span>
+                  </div>
+                  
+                  <h3 class="text-lg font-semibold text-foreground mb-2">{{ product.name }}</h3>
+                  
+                  <div *ngIf="viewMode === 'list'" class="text-sm text-muted-foreground mb-4 space-y-1">
+                    <p>Movement: {{ product.movement }}</p>
+                    <p>Material: {{ product.material }}</p>
+                    <p>Category: {{ product.category }}</p>
+                  </div>
+                  
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xl font-bold text-foreground">\${{ product.price }}</span>
+                      <span *ngIf="product.originalPrice" class="text-sm text-muted-foreground line-through">
+                        \${{ product.originalPrice }}
+                      </span>
+                    </div>
+                    <a [routerLink]="['/products', product.id]" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                      View Details
+                    </a>
+                  </div>
+                </ui-card-content>
+              </ui-card>
+            </div>
+
+            <!-- No Results -->
+            <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
+              <p class="text-muted-foreground text-lg">No products found matching your criteria.</p>
+              <button (click)="clearFilters()" class="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Filters Sidebar -->
+    <div *ngIf="showMobileFilters" class="fixed inset-0 z-50 md:hidden">
+      <div class="fixed inset-0 bg-black/50" (click)="toggleFilters()"></div>
+      <div class="fixed left-0 top-0 h-full w-80 bg-background border-r border-border shadow-lg overflow-y-auto">
+        <div class="p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Filters</h2>
+            <button (click)="toggleFilters()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+              <ng-icon name="ionFilter" class="w-5 h-5"></ng-icon>
+            </button>
+          </div>
+          
+          <!-- Mobile Search -->
+          <div class="relative">
+            <ng-icon name="SearchIcon" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"></ng-icon>
+            <input
+              type="text"
+              placeholder="Search watches..."
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="filterProducts()"
+            />
+          </div>
+
+          <!-- Mobile Price Range -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Price Range</h3>
+            <div class="space-y-2">
+              <input
+                type="range"
+                min="0"
+                max="2000"
+                step="50"
+                [(ngModel)]="priceRange[0]"
+                (ngModelChange)="filterProducts()"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <input
+                type="range"
+                min="0"
+                max="2000"
+                step="50"
+                [(ngModel)]="priceRange[1]"
+                (ngModelChange)="filterProducts()"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-sm text-muted-foreground">
+                <span>\${{ priceRange[0] }}</span>
+                <span>\${{ priceRange[1] }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Categories -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Category</h3>
+            <div class="space-y-2">
+              <label *ngFor="let category of categories" class="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="selectedCategories[category]"
+                  (ngModelChange)="filterProducts()"
+                  class="rounded border-border text-primary focus:ring-primary"
+                />
+                <span class="text-sm">{{ category }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mobile Materials -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Material</h3>
+            <div class="space-y-2">
+              <label *ngFor="let material of materials" class="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="selectedMaterials[material]"
+                  (ngModelChange)="filterProducts()"
+                  class="rounded border-border text-primary focus:ring-primary"
+                />
+                <span class="text-sm">{{ material }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,137 @@
+<!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
+        <img
+          src="/placeholder.svg?height=1080&width=1920"
+          alt="Hero watch"
+          class="w-full h-full object-cover opacity-30"
+        />
+      </div>
+      <div class="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
+        <h1 class="text-5xl md:text-7xl font-light mb-6 tracking-tight">
+          Time
+          <span class="block font-bold">Redefined</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          Discover our collection of meticulously crafted timepieces that blend traditional craftsmanship with modern innovation.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a routerLink="/products" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 text-lg">
+            Explore Collection
+            <ng-icon name="heroArrowRight" class="ml-2 w-5 h-5"></ng-icon>
+          </a>
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white hover:bg-white hover:text-black h-11 px-8 text-lg">
+            Watch Our Story
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-20 bg-muted/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-light text-foreground mb-4">Featured Timepieces</h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Handpicked selections from our master craftsmen, each piece telling its own unique story.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <ui-card *ngFor="let product of featuredProducts" class="group cursor-pointer hover:shadow-xl transition-all duration-300">
+            <div class="relative overflow-hidden">
+              <img
+                [src]="product.image"
+                [alt]="product.name"
+                class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div class="absolute top-4 left-4 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
+                {{ product.badge }}
+              </div>
+              <button class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-10">
+                <ng-icon name="heroHeart" class="w-4 h-4"></ng-icon>
+              </button>
+            </div>
+            
+            <ui-card-content class="p-6">
+              <div class="flex items-center mb-2">
+                <div class="flex items-center">
+                  <ng-icon *ngFor="let star of getStars(product.rating)" name="heroStar" class="w-4 h-4 text-yellow-400 fill-current"></ng-icon>
+                  <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="heroStar" class="w-4 h-4 text-gray-300"></ng-icon>
+                </div>
+                <span class="text-sm text-muted-foreground ml-2">({{ product.reviews }})</span>
+              </div>
+              
+              <h3 class="text-lg font-semibold text-foreground mb-2">{{ product.name }}</h3>
+              
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl font-bold text-foreground">\${{ product.price }}</span>
+                  <span *ngIf="product.originalPrice" class="text-sm text-muted-foreground line-through">
+                    \${{ product.originalPrice }}
+                  </span>
+                </div>
+                <button (click)="addToCart(product)" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                  Add to Cart
+                </button>
+              </div>
+            </ui-card-content>
+          </ui-card>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collections -->
+    <section class="py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-light text-foreground mb-4">Our Collections</h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Each collection represents a different facet of horological excellence, designed for every lifestyle and occasion.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div *ngFor="let collection of collections" class="group cursor-pointer">
+            <div class="relative overflow-hidden rounded-lg mb-4">
+              <img
+                [src]="collection.image"
+                [alt]="collection.name"
+                class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div class="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300"></div>
+              <div class="absolute bottom-6 left-6 text-white">
+                <h3 class="text-2xl font-semibold mb-2">{{ collection.name }}</h3>
+                <p class="text-sm opacity-90">{{ collection.count }}</p>
+              </div>
+            </div>
+            <p class="text-muted-foreground mb-4">{{ collection.description }}</p>
+            <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+              Explore Collection
+              <ng-icon name="heroArrowRight" class="ml-2 w-4 h-4"></ng-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-20 bg-primary text-primary-foreground">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-light mb-4">Stay in Time</h2>
+        <p class="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
+          Be the first to know about new collections, exclusive releases, and horological insights from our master craftsmen.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="flex h-10 w-full rounded-md border border-input bg-white/10 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1 border-white/20 text-white"
+            [(ngModel)]="email"
+          />
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2">
+            Subscribe
+          </button>
+        </div>
+      </div>
+    </section>

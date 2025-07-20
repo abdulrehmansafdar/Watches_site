@@ -1,0 +1,269 @@
+ <div class="min-h-screen bg-background" *ngIf="product">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <!-- Product Images -->
+          <div class="space-y-4">
+            <div class="relative aspect-square overflow-hidden rounded-lg bg-muted">
+              <img
+                [src]="product.images[selectedImage]"
+                [alt]="product.name"
+                class="w-full h-full object-cover"
+              />
+              <div *ngIf="product.badge" class="absolute top-4 left-4 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
+                {{ product.badge }}
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              <button
+                *ngFor="let image of product.images; let i = index"
+                (click)="selectedImage = i"
+                [class]="'relative aspect-square overflow-hidden rounded-lg border-2 transition-colors ' + 
+                         (selectedImage === i ? 'border-primary' : 'border-border hover:border-muted-foreground')"
+              >
+                <img
+                  [src]="image"
+                  [alt]="product.name + ' view ' + (i + 1)"
+                  class="w-full h-full object-cover"
+                />
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="space-y-6">
+            <div>
+              <div class="flex items-center mb-2">
+                <div class="flex items-center">
+                  <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-5 h-5 text-yellow-400 fill-current"></ng-icon>
+                  <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-5 h-5 text-gray-300"></ng-icon>
+                </div>
+                <span class="text-sm text-muted-foreground ml-2">({{ product.reviews }} reviews)</span>
+              </div>
+              <h1 class="text-3xl font-light text-foreground mb-2">{{ product.name }}</h1>
+              <p class="text-muted-foreground mb-4">
+                {{ product.brand }} • {{ product.category }}
+              </p>
+
+              <div class="flex items-center space-x-4 mb-6">
+                <span class="text-3xl font-bold text-foreground">\${{ product.price }}</span>
+                <span *ngIf="product.originalPrice" class="text-xl text-muted-foreground line-through">
+                  \${{ product.originalPrice }}
+                </span>
+                <div *ngIf="product.originalPrice" class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80">
+                  Save \${{ product.originalPrice - product.price }}
+                </div>
+              </div>
+            </div>
+
+            <p class="text-muted-foreground leading-relaxed">{{ product.description }}</p>
+
+            <!-- Key Specs -->
+            <div class="grid grid-cols-2 gap-4 py-4 border-t border-b border-border">
+              <div>
+                <span class="text-sm text-muted-foreground">Movement</span>
+                <p class="font-medium">{{ product.movement }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-muted-foreground">Case Size</span>
+                <p class="font-medium">{{ product.caseDiameter }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-muted-foreground">Material</span>
+                <p class="font-medium">{{ product.material }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-muted-foreground">Water Resistance</span>
+                <p class="font-medium">{{ product.waterResistance }}</p>
+              </div>
+            </div>
+
+            <!-- Quantity and Add to Cart -->
+            <div class="space-y-4">
+              <div class="flex items-center space-x-4">
+                <span class="text-sm font-medium">Quantity:</span>
+                <div class="flex items-center border border-border rounded-md">
+                  <button (click)="decreaseQuantity()" [disabled]="quantity <= 1" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <ng-icon name="ionBag" class="w-4 h-4"></ng-icon>
+                  </button>
+                  <span class="px-4 py-2 text-center min-w-[3rem]">{{ quantity }}</span>
+                  <button (click)="increaseQuantity()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <ng-icon name="ionAdd" class="w-4 h-4"></ng-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex space-x-4">
+                <button (click)="addToCart()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 flex-1">
+                  <ng-icon name="ionBag" class="mr-2 w-5 h-5"></ng-icon>
+                  Add to Cart
+                </button>
+                <button (click)="toggleWishlist()" [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ' + (isWishlisted ? 'text-red-600 border-red-600' : '')">
+                  <ng-icon name="ionHeart" [class]="'w-5 h-5 ' + (isWishlisted ? 'fill-current' : '')"></ng-icon>
+                </button>
+                <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                  <ng-icon name="heroShare" class="w-5 h-5"></ng-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="grid grid-cols-3 gap-4 pt-6 border-t border-border">
+              <div class="text-center">
+                <ng-icon name="ionShieldOutline" class="w-8 h-8 mx-auto mb-2 text-green-600"></ng-icon>
+                <p class="text-sm font-medium">2 Year Warranty</p>
+              </div>
+              <div class="text-center">
+                <ng-icon name="featherTruck" class="w-8 h-8 mx-auto mb-2 text-blue-600"></ng-icon>
+                <p class="text-sm font-medium">Free Shipping</p>
+              </div>
+              <div class="text-center">
+                <ng-icon name="ionRefresh" class="w-8 h-8 mx-auto mb-2 text-purple-600"></ng-icon>
+                <p class="text-sm font-medium">30-Day Returns</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="mt-16">
+          <div class="border-b border-border">
+            <nav class="-mb-px flex space-x-8">
+              <button
+                *ngFor="let tab of tabs; let i = index"
+                (click)="activeTab = i"
+                [class]="'py-2 px-1 border-b-2 font-medium text-sm ' + 
+                         (activeTab === i ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300')"
+              >
+                {{ tab.label }}
+              </button>
+            </nav>
+          </div>
+
+          <div class="mt-8">
+            <!-- Features Tab -->
+            <div *ngIf="activeTab === 0">
+              <ui-card>
+                <ui-card-content class="p-6">
+                  <h3 class="text-xl font-semibold mb-4">Key Features</h3>
+                  <ul class="space-y-3">
+                    <li *ngFor="let feature of product.features" class="flex items-start">
+                      <div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                      <span>{{ feature }}</span>
+                    </li>
+                  </ul>
+                </ui-card-content>
+              </ui-card>
+            </div>
+
+            <!-- Specifications Tab -->
+            <div *ngIf="activeTab === 1">
+              <ui-card>
+                <ui-card-content class="p-6">
+                  <h3 class="text-xl font-semibold mb-4">Technical Specifications</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div *ngFor="let spec of getSpecifications()" class="flex justify-between py-2 border-b border-border">
+                      <span class="font-medium text-muted-foreground">{{ spec.key }}:</span>
+                      <span class="text-foreground">{{ spec.value }}</span>
+                    </div>
+                  </div>
+                </ui-card-content>
+              </ui-card>
+            </div>
+
+            <!-- Reviews Tab -->
+            <div *ngIf="activeTab === 2">
+              <div class="space-y-6">
+                <!-- Review Summary -->
+                <ui-card>
+                  <ui-card-content class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                      <h3 class="text-xl font-semibold">Customer Reviews</h3>
+                      <div class="flex items-center space-x-2">
+                        <div class="flex items-center">
+                          <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-5 h-5 text-yellow-400 fill-current"></ng-icon>
+                          <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-5 h-5 text-gray-300"></ng-icon>
+                        </div>
+                        <span class="text-lg font-semibold">{{ product.rating }}</span>
+                        <span class="text-muted-foreground">({{ product.reviews }} reviews)</span>
+                      </div>
+                    </div>
+
+                    <!-- Add Review Form -->
+                    <div class="border-t border-border pt-6">
+                      <h4 class="text-lg font-semibold mb-4">Write a Review</h4>
+                      <form (ngSubmit)="submitReview()" class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                          <span class="text-sm font-medium">Rating:</span>
+                          <div class="flex items-center">
+                            <button
+                              *ngFor="let star of [1,2,3,4,5]; let i = index"
+                              type="button"
+                              (click)="setRating(i + 1)"
+                              class="p-1"
+                            >
+                              <ng-icon name="ionStar" [class]="(i + 1) <= newReview.rating ? 'w-5 h-5 text-yellow-400 fill-current' : 'w-5 h-5 text-gray-300'"></ng-icon>
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label class="block text-sm font-medium mb-2">Your Name</label>
+                          <input
+                            type="text"
+                            [(ngModel)]="newReview.userName"
+                            name="userName"
+                            required
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label class="block text-sm font-medium mb-2">Your Review</label>
+                          <textarea
+                            [(ngModel)]="newReview.comment"
+                            name="comment"
+                            rows="4"
+                            required
+                            class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          ></textarea>
+                        </div>
+                        
+                        <button type="submit" [disabled]="!isReviewValid()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                          Submit Review
+                        </button>
+                      </form>
+                    </div>
+                  </ui-card-content>
+                </ui-card>
+
+                <!-- Reviews List -->
+                <div class="space-y-4">
+                  <ui-card *ngFor="let review of reviews">
+                    <ui-card-content class="p-6">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                          <span class="font-medium">{{ review.userName }}</span>
+                          <div *ngIf="review.verified" class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-green-100 text-green-800">
+                            Verified Purchase
+                          </div>
+                          <div class="flex items-center">
+                            <ng-icon *ngFor="let star of getStars(review.rating)" name="ionStar" class="w-4 h-4 text-yellow-400 fill-current"></ng-icon>
+                            <ng-icon *ngFor="let star of getEmptyStars(review.rating)" name="ionStar" class="w-4 h-4 text-gray-300"></ng-icon>
+                          </div>
+                        </div>
+                        <span class="text-sm text-muted-foreground">{{ review.date }}</span>
+                      </div>
+                      <p class="text-muted-foreground">{{ review.comment }}</p>
+                    </ui-card-content>
+                  </ui-card>
+                </div>
+
+                <button *ngIf="hasMoreReviews" (click)="loadMoreReviews()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full">
+                  Load More Reviews
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
