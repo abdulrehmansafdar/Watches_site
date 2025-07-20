@@ -20,6 +20,7 @@ import { heroEnvelope, heroPhone, heroMapPin } from '@ng-icons/heroicons/outline
   })]
 })
 export class FooterComponent {
+  currentYear :number = new Date().getFullYear();
   constructor() {}
 }
  

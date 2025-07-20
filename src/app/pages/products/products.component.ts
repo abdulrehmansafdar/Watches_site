@@ -1,12 +1,12 @@
-import { Component,  OnInit } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule,  ActivatedRoute } from "@angular/router"
+import { RouterModule } from "@angular/router"
 import { FormsModule } from "@angular/forms"
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import  { CartService } from "../../services/cart.service"
+
 import { CardComponent, CardContentComponent } from "../../components/card/card.component"
-import { heroMagnifyingGlass } from '@ng-icons/heroicons/outline';
-import { ionGridOutline,ionFilter,ionList ,ionStar,ionHeart} from '@ng-icons/ionicons';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { heroMagnifyingGlass, heroEye, heroShoppingBag, heroXMark } from '@ng-icons/heroicons/outline';
+import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart } from "@ng-icons/ionicons"
 
 interface Product {
   id: number
@@ -28,161 +28,104 @@ interface Product {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss',
-  viewProviders: [provideIcons({ heroMagnifyingGlass, ionGridOutline,ionFilter,ionList,ionStar ,ionHeart})]
+  viewProviders: [provideIcons({ 
+    heroMagnifyingGlass, 
+    ionGridOutline,
+    ionFilter,
+    ionList,
+    ionStar,
+    ionHeart,
+    heroEye,
+    heroShoppingBag,
+    heroXMark
+  })]
 })
 export class ProductsComponent implements OnInit {
 
-  SearchIcon = heroMagnifyingGlass
-  FilterIcon = ionFilter
-  GridIcon = ionGridOutline
-  ListIcon = ionList
-  StarIcon = ionStar
-  HeartIcon = ionHeart
+  Math = Math
+  
+  searchQuery = ''
+  sortBy = 'featured'
+  viewMode: 'grid' | 'list' = 'grid'
+  showMobileFilters = false
+  priceRange = [0, 2000]
 
-  products: Product[] = [
+  categories = ['Luxury', 'Sport', 'Minimalist', 'Classic', 'Digital']
+  materials = ['Stainless Steel', 'Gold', 'Titanium', 'Ceramic', 'Leather']
+  
+  selectedCategories: { [key: string]: boolean } = {}
+  selectedMaterials: { [key: string]: boolean } = {}
+
+  allProducts: Product[] = [
     {
       id: 1,
       name: "Chronos Elite",
       price: 899,
       originalPrice: 1299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-1.webp",
       rating: 4.8,
       reviews: 124,
       badge: "Best Seller",
       category: "Luxury",
       brand: "Chronos",
       movement: "Automatic",
-      material: "Stainless Steel",
+      material: "Stainless Steel"
     },
     {
       id: 2,
       name: "Minimal Classic",
       price: 299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-2.webp",
       rating: 4.6,
       reviews: 89,
       badge: "New",
       category: "Minimalist",
       brand: "Chronos",
       movement: "Quartz",
-      material: "Leather",
+      material: "Stainless Steel"
     },
     {
       id: 3,
       name: "Sport Pro",
       price: 599,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-3.webp",
       rating: 4.9,
       reviews: 156,
       badge: "Popular",
       category: "Sport",
       brand: "Chronos",
       movement: "Automatic",
-      material: "Titanium",
+      material: "Titanium"
     },
     {
       id: 4,
       name: "Heritage Gold",
       price: 1299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-4.webp",
       rating: 4.7,
       reviews: 67,
       badge: "Limited",
       category: "Luxury",
       brand: "Chronos",
       movement: "Manual",
-      material: "Gold",
+      material: "Gold"
     },
-    {
-      id: 5,
-      name: "Urban Explorer",
-      price: 449,
-      image: "/placeholder.svg?height=400&width=400",
-      rating: 4.5,
-      reviews: 92,
-      category: "Sport",
-      brand: "Chronos",
-      movement: "Quartz",
-      material: "Stainless Steel",
-    },
-    {
-      id: 6,
-      name: "Classic Dress",
-      price: 799,
-      image: "/placeholder.svg?height=400&width=400",
-      rating: 4.8,
-      reviews: 78,
-      category: "Luxury",
-      brand: "Chronos",
-      movement: "Automatic",
-      material: "Leather",
-    },
+   
   ]
 
   filteredProducts: Product[] = []
-  viewMode = "grid"
-  sortBy = "featured"
-  priceRange = [0, 2000]
-  searchQuery = ""
-  showMobileFilters = false
-
-  categories = ["Luxury", "Sport", "Minimalist", "Dress"]
-  materials = ["Stainless Steel", "Leather", "Titanium", "Gold"]
-
-  selectedCategories: { [key: string]: boolean } = {}
-  selectedMaterials: { [key: string]: boolean } = {}
-
-  constructor(
-    private route: ActivatedRoute,
-    private cartService: CartService,
-  ) {}
 
   ngOnInit() {
-    this.filteredProducts = [...this.products]
-
-    // Check for category filter from route params
-    this.route.queryParams.subscribe((params) => {
-      if (params["category"]) {
-        const category = this.capitalizeFirst(params["category"])
-        if (this.categories.includes(category)) {
-          this.selectedCategories[category] = true
-          this.filterProducts()
-        }
-      }
-    })
+    this.filteredProducts = [...this.allProducts]
+    this.initializeFilters()
   }
 
-  filterProducts() {
-    this.filteredProducts = this.products.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      const matchesCategory =
-        Object.keys(this.selectedCategories).length === 0 ||
-        Object.keys(this.selectedCategories).some((cat) => this.selectedCategories[cat] && product.category === cat)
-      const matchesMaterial =
-        Object.keys(this.selectedMaterials).length === 0 ||
-        Object.keys(this.selectedMaterials).some((mat) => this.selectedMaterials[mat] && product.material === mat)
-      const matchesPrice = product.price >= this.priceRange[0] && product.price <= this.priceRange[1]
-
-      return matchesSearch && matchesCategory && matchesMaterial && matchesPrice
+  initializeFilters() {
+    this.categories.forEach(category => {
+      this.selectedCategories[category] = false
     })
-
-    this.sortProducts()
-  }
-
-  sortProducts() {
-    this.filteredProducts.sort((a, b) => {
-      switch (this.sortBy) {
-        case "price-low":
-          return a.price - b.price
-        case "price-high":
-          return b.price - a.price
-        case "rating":
-          return b.rating - a.rating
-        case "newest":
-          return b.id - a.id
-        default:
-          return 0
-      }
+    this.materials.forEach(material => {
+      this.selectedMaterials[material] = false
     })
   }
 
@@ -198,15 +141,55 @@ export class ProductsComponent implements OnInit {
     this.showMobileFilters = !this.showMobileFilters
   }
 
-  clearFilters() {
-    this.selectedCategories = {}
-    this.selectedMaterials = {}
-    this.priceRange = [0, 2000]
-    this.searchQuery = ""
-    this.filterProducts()
+  filterProducts() {
+    this.filteredProducts = this.allProducts.filter(product => {
+      // Search filter
+      const matchesSearch = !this.searchQuery || 
+        product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.brand.toLowerCase().includes(this.searchQuery.toLowerCase())
+
+      // Price filter
+      const matchesPrice = product.price >= this.priceRange[0] && product.price <= this.priceRange[1]
+
+      // Category filter
+      const selectedCats = Object.keys(this.selectedCategories).filter(cat => this.selectedCategories[cat])
+      const matchesCategory = selectedCats.length === 0 || selectedCats.includes(product.category)
+
+      // Material filter
+      const selectedMats = Object.keys(this.selectedMaterials).filter(mat => this.selectedMaterials[mat])
+      const matchesMaterial = selectedMats.length === 0 || selectedMats.includes(product.material)
+
+      return matchesSearch && matchesPrice && matchesCategory && matchesMaterial
+    })
+
+    this.sortProducts()
   }
 
-  private capitalizeFirst(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1)
+  sortProducts() {
+    switch (this.sortBy) {
+      case 'price-low':
+        this.filteredProducts.sort((a, b) => a.price - b.price)
+        break
+      case 'price-high':
+        this.filteredProducts.sort((a, b) => b.price - a.price)
+        break
+      case 'rating':
+        this.filteredProducts.sort((a, b) => b.rating - a.rating)
+        break
+      case 'newest':
+        this.filteredProducts.sort((a, b) => b.id - a.id)
+        break
+      default:
+        // Featured - keep original order
+        break
+    }
+  }
+
+  clearFilters() {
+    this.searchQuery = ''
+    this.priceRange = [0, 2000]
+    this.initializeFilters()
+    this.filterProducts()
   }
 }

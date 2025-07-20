@@ -6,7 +6,8 @@ import { FormsModule } from "@angular/forms"
 import { CartService } from "../../services/cart.service"
 import { CardComponent, CardContentComponent } from "../../components/card/card.component"
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroArrowRight, heroStar, heroHeart } from '@ng-icons/heroicons/outline';
+import { heroArrowRight, heroStar, heroHeart, heroEye } from '@ng-icons/heroicons/outline';
+import { ionBag, ionStar } from "@ng-icons/ionicons"
 
 interface Product {
   id: number
@@ -25,23 +26,20 @@ interface Product {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  viewProviders: [provideIcons({ heroArrowRight, heroStar, heroHeart })]
+  viewProviders: [provideIcons({ heroArrowRight, heroStar, heroHeart,heroEye,ionBag,ionStar })]
 })
 export class HomeComponent {
-email = ""
+  email = ""
+  Math = Math
 
-  // Lucide icons
-  ArrowRightIcon = heroArrowRight
-  StarIcon = heroStar
-  HeartIcon = heroHeart
-
+ 
   featuredProducts: Product[] = [
     {
       id: 1,
       name: "Chronos Elite",
       price: 899,
       originalPrice: 1299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-1.webp",
       rating: 4.8,
       reviews: 124,
       badge: "Best Seller",
@@ -51,7 +49,7 @@ email = ""
       id: 2,
       name: "Minimal Classic",
       price: 299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-2.webp",
       rating: 4.6,
       reviews: 89,
       badge: "New",
@@ -61,7 +59,7 @@ email = ""
       id: 3,
       name: "Sport Pro",
       price: 599,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-3.webp",
       rating: 4.9,
       reviews: 156,
       badge: "Popular",
@@ -71,7 +69,7 @@ email = ""
       id: 4,
       name: "Heritage Gold",
       price: 1299,
-      image: "/placeholder.svg?height=400&width=400",
+      image: "/assets/d-4.webp",
       rating: 4.7,
       reviews: 67,
       badge: "Limited",
@@ -83,24 +81,26 @@ email = ""
     {
       name: "Luxury Collection",
       description: "Exquisite timepieces for the discerning collector",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/assets/luxury.webp",
       count: "24 watches",
     },
     {
       name: "Sport Series",
       description: "Built for performance and adventure",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/assets/sports.webp",
       count: "18 watches",
     },
     {
       name: "Minimalist Line",
       description: "Clean design meets modern functionality",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/assets/mini.webp",
       count: "12 watches",
     },
   ]
 
-  constructor(private cartService: CartService) {}
+  constructor(private cartService: CartService,
+
+  ) { }
 
   getStars(rating: number): number[] {
     return Array(Math.floor(rating)).fill(0)
@@ -121,4 +121,3 @@ email = ""
     })
   }
 }
- 

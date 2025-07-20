@@ -12,16 +12,19 @@
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-8">
               <a routerLink="/" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}" 
-                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                 class="relative text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors group">
                 Home
+                <span class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
               </a>
               <a routerLink="/products" routerLinkActive="text-primary" 
-                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                 class="relative text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors group">
                 Products
+                <span class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
               </a>
               <a routerLink="/contact" routerLinkActive="text-primary" 
-                 class="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors">
+                 class="relative text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors group">
                 Contact
+                <span class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
               </a>
             </div>
           </div>
