@@ -16,121 +16,133 @@
           Discover our collection of meticulously crafted timepieces that blend traditional craftsmanship with modern innovation.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a routerLink="/products" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 text-lg">
+          <a routerLink="/products" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 ">
             Explore Collection
             <ng-icon name="heroArrowRight" class="ml-2 w-5 h-5"></ng-icon>
           </a>
-          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white hover:bg-white hover:text-black h-11 px-8 text-lg">
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white hover:bg-white hover:text-black h-11 px-8 ">
             Watch Our Story
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Featured Products -->
+     <!-- Product Categories Carousel -->
     <section class="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-light text-foreground mb-4 tracking-tight">Featured Timepieces</h2>
+          <h2 class="text-4xl font-light text-foreground mb-4 tracking-tight">Featured Collections</h2>
           <p class="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Handpicked selections from our master craftsmen, each piece telling its own unique story.
+            Explore our curated selection of timepieces, each collection crafted for distinct lifestyles.
           </p>
           <div class="w-24 h-1 bg-gradient-to-r from-primary to-primary/60 mx-auto mt-6 rounded-full"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <ui-card *ngFor="let product of featuredProducts" 
-                   class="group cursor-pointer bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-700 overflow-hidden border border-gray-100 dark:border-gray-800 hover:border-primary/20 hover:-translate-y-2 backdrop-blur-sm">
-            
-            <div class="relative overflow-hidden">
-              <!-- Enhanced image container with better aspect ratio -->
-              <div class="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
-                <img
-                  [src]="product.image"
-                  [alt]="product.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  loading="lazy"
-                />
-                <!-- Sophisticated overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-              </div>
-              
-              <!-- Premium floating badge -->
-              <div class="absolute top-4 left-4 z-10">
-                <div class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-white/95 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-lg backdrop-blur-md border border-white/20">
-                  <div class="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse"></div>
-                  {{ product.badge }}
-                </div>
-              </div>
-              
-              <!-- Enhanced action buttons -->
-              <div class="absolute top-4 right-4 z-10 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-500">
-                <button class="w-10 h-10 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg hover:shadow-xl flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-white/20">
-                  <ng-icon name="heroHeart" class="w-5 h-5"></ng-icon>
-                </button>
-                <button class="w-10 h-10 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg hover:shadow-xl flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-primary hover:scale-110 transition-all duration-300 border border-white/20">
-                  <ng-icon name="heroEye" class="w-5 h-5"></ng-icon>
-                </button>
-              </div>
-
-            
+        <!-- Category Carousels -->
+        <div *ngFor="let category of productCategories" class="mb-16">
+          <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-light text-foreground">{{ category.name }}</h3>
+            <div class="flex items-center space-x-2">
+              <button 
+                (click)="prevSlide(category.id)"
+                [disabled]="currentSlides[category.id] === 0"
+                class="w-10 h-10 rounded-full border border-border hover:border-primary flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent">
+                <ng-icon name="heroChevronLeft" class="w-5 h-5"></ng-icon>
+              </button>
+              <button 
+                (click)="nextSlide(category.id)"
+                [disabled]="currentSlides[category.id] >= category.products.length - 4"
+                class="w-10 h-10 rounded-full border border-border hover:border-primary flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent">
+                <ng-icon name="heroChevronRight" class="w-5 h-5"></ng-icon>
+              </button>
             </div>
-            
-            <!-- Enhanced card content -->
-            <ui-card-content class="p-6 space-y-4 bg-white dark:bg-gray-900">
-              <!-- Rating and reviews with better styling -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <div class="flex items-center space-x-0.5">
-                    <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-4 h-4 text-amber-400 fill-current"></ng-icon>
-                    <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-4 h-4 text-gray-200 dark:text-gray-600"></ng-icon>
-                  </div>
-                  <span class="text-sm font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
-                </div>
-                <div class="text-xs text-muted-foreground bg-gray-50 dark:bg-gray-800 px-3 py-1 rounded-full">
-                  {{ product.reviews }} reviews
-                </div>
-              </div>
+          </div>
+
+          <!-- Product Cards Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <ui-card *ngFor="let product of getVisibleProducts(category)" 
+                     [routerLink]="['/product', product.id]"
+                     class="group cursor-pointer bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1">
               
-              <!-- Product information with better hierarchy -->
-              <div class="space-y-2">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-300 leading-tight">
-                  {{ product.name }}
-                </h3>
-                <p class="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                  {{ product.category }}
-                </p>
-              </div>
-              
-              <!-- Enhanced pricing with better visual hierarchy -->
-              <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
-                <div class="flex items-center justify-between mb-4">
-                  <div class="flex items-baseline space-x-2">
-                    <span class="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${{ product.price }}
-                    </span>
-                    <span *ngIf="product.originalPrice" class="text-base text-muted-foreground line-through">
-                      ${{ product.originalPrice }}
-                    </span>
-                  </div>
-                  <div *ngIf="product.originalPrice" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                    -{{ Math.round((1 - product.price / product.originalPrice) * 100) }}%
+              <div class="relative overflow-hidden">
+                <!-- Compact image container -->
+                <div class="relative aspect-[3/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+                  <img
+                    [src]="product.image"
+                    [alt]="product.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <!-- Overlay -->
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                </div>
+                
+                <!-- Compact badge -->
+                <div *ngIf="product.badge" class="absolute top-2 left-2 z-10">
+                  <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-white/95 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-md backdrop-blur-md border border-white/20">
+                    <div class="w-1.5 h-1.5 rounded-full bg-primary mr-1"></div>
+                    {{ product.badge }}
                   </div>
                 </div>
                 
-                <!-- Enhanced main CTA button -->
-                <button (click)="addToCart(product)" class="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-secondary py-3 px-6 rounded-xl font-semibold text-sm shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 group/btn transform hover:scale-[1.02] active:scale-[0.98]">
-                  <ng-icon name="ionBag" class="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-300"></ng-icon>
-                  <span>Add to Cart</span>
-                </button>
+                <!-- Compact action buttons -->
+                <div class="absolute top-2 right-2 z-10 flex space-x-1 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <button (click)="$event.stopPropagation()" class="w-8 h-8 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md hover:shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-white/20">
+                    <ng-icon name="heroHeart" class="w-4 h-4"></ng-icon>
+                  </button>
+                </div>
               </div>
-            </ui-card-content>
-          </ui-card>
+              
+              <!-- Compact card content -->
+              <ui-card-content class="p-4 space-y-3 bg-white dark:bg-gray-900">
+                <!-- Compact rating -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-1">
+                    <div class="flex items-center space-x-0.5">
+                      <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-3 h-3 text-amber-400 fill-current"></ng-icon>
+                      <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-3 h-3 text-gray-200 dark:text-gray-600"></ng-icon>
+                    </div>
+                    <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
+                  </div>
+                  <div class="text-xs text-muted-foreground bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full">
+                    {{ product.reviews }} reviews
+                  </div>
+                </div>
+                
+                <!-- Compact product information -->
+                <div class="space-y-1">
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-300 leading-tight">
+                    {{ product.name }}
+                  </h3>
+                  <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                    {{ product.category }}
+                  </p>
+                </div>
+                
+                <!-- Compact pricing -->
+                <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-baseline space-x-1">
+                      <span class="text-lg font-bold text-gray-900 dark:text-white">
+                        ${{ product.price }}
+                      </span>
+                      <span *ngIf="product.originalPrice" class="text-sm text-muted-foreground line-through">
+                        ${{ product.originalPrice }}
+                      </span>
+                    </div>
+                    <div *ngIf="product.originalPrice" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">
+                      -{{ Math.round((1 - product.price / product.originalPrice) * 100) }}%
+                    </div>
+                  </div>
+                </div>
+              </ui-card-content>
+            </ui-card>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Enhanced Collections Section -->
+     <!-- Enhanced Collections Section -->
     <section class="py-20 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">

@@ -1,0 +1,139 @@
+.step-indicator {
+  transition: all 0.3s ease;
+}
+
+.form-input {
+  transition: all 0.2s ease;
+  
+  &:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  }
+}
+
+.shipping-method-card {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.selected {
+    border-color: rgb(59 130 246);
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+}
+
+.order-summary {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.checkout-button {
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.progress-step {
+  transition: all 0.3s ease;
+  
+  &.active {
+    transform: scale(1.1);
+  }
+  
+  &.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+}
+
+.animate-in {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-animation {
+  animation: successBounce 0.8s ease-out;
+}
+
+@keyframes successBounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .step-labels {
+    display: none;
+  }
+  
+  .mobile-step-indicator {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+  }
+}
+
+// Dark mode improvements
+.dark {
+  .order-summary {
+    background-color: rgba(31, 41, 55, 0.95);
+  }
+  
+  .form-input {
+    &:focus {
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+  }
+}
+
+// Card animation
+.payment-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: perspective(1000px) rotateX(5deg);
+  }
+}
+
+// Loading states
+.processing-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

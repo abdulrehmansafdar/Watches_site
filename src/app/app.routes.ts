@@ -28,6 +28,18 @@ export const routes: Routes = [
     path: "checkout",
     loadComponent: () => import("./pages/checkout/checkout.component").then((m) => m.CheckoutComponent),
   },
+   {
+    path: "login",
+    loadComponent: () => import("./pages/login/login.component").then((m) => m.LoginComponent),
+  },
+  {
+    path: "otp",
+    loadComponent: () => import("./pages/otp/otp.component").then((m) => m.OtpComponent),
+  },
+   {
+    path: "check-out",
+    loadComponent: () => import("./pages/checkout/checkout.component").then((m) => m.CheckoutComponent),
+  },
   {
     path: "**",
     redirectTo: "",

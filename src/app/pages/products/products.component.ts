@@ -192,4 +192,10 @@ export class ProductsComponent implements OnInit {
     this.initializeFilters()
     this.filterProducts()
   }
+
+  // Add method to handle card click
+  navigateToProduct(productId: number, event: Event) {
+    // Navigate to product detail page
+    // This will be handled by routerLink in template
+  }
 }

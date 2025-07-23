@@ -4,8 +4,9 @@ import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { CartService } from '../../services/cart.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroXMark } from '@ng-icons/heroicons/outline';
+import { heroUser, heroXMark } from '@ng-icons/heroicons/outline';
 import { ionCart, ionSunny, ionMoon, ionMenu } from '@ng-icons/ionicons';
+import { featherUser } from '@ng-icons/feather-icons';
 
 @Component({
   selector: 'app-header',
@@ -17,7 +18,9 @@ import { ionCart, ionSunny, ionMoon, ionMenu } from '@ng-icons/ionicons';
     ionSunny, 
     ionMoon, 
     ionMenu, 
-    heroXMark 
+    heroXMark ,
+    heroUser,
+    featherUser
   })]
 })
 export class HeaderComponent implements OnInit {
