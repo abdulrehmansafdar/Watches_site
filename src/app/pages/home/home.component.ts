@@ -13,12 +13,13 @@ interface Product {
   id: number
   name: string
   price: number
-  originalPrice?: number
+  originalPrice: number
   image: string
   rating: number
   reviews: number
   badge?: string
-  category: string
+  category: string,
+ 
 }
 
 interface Collection {
@@ -55,6 +56,7 @@ export class HomeComponent {
           reviews: 124,
           badge: "Best Seller",
           category: "Luxury",
+        
         },
         {
           id: 2,
@@ -171,6 +173,7 @@ export class HomeComponent {
           reviews: 89,
           badge: "New",
           category: "Minimalist",
+          originalPrice: 399,
         }
       ]
     },
@@ -187,6 +190,7 @@ export class HomeComponent {
           reviews: 156,
           badge: "Popular",
           category: "Sport",
+          originalPrice: 699,
         }
       ]
     }
@@ -229,6 +233,13 @@ export class HomeComponent {
   getEmptyStars(rating: number): number[] {
     return Array(5 - Math.floor(rating)).fill(0)
   }
+  scrollCarousel(categoryId: string, direction: 'left' | 'right') {
+  const el = document.getElementById(`carousel-${categoryId}`);
+  if (el) {
+    const scrollAmount = 300; // px per card
+    el.scrollBy({ left: direction === 'right' ? scrollAmount : -scrollAmount, behavior: 'smooth' });
+  }
+}
 
   // Carousel navigation methods
   nextSlide(categoryId: string) {

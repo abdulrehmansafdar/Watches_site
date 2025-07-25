@@ -130,7 +130,7 @@
               <!-- Compact Grid View Card -->
               <ui-card
                 *ngFor="let product of filteredProducts"
-                [routerLink]="['/product', product.id]"
+                [routerLink]="['/products', product.id]"
                 [ngClass]="viewMode === 'grid' ? 'group cursor-pointer bg-card dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1' : ''"
                 [class.hidden]="viewMode === 'list'"
               >
