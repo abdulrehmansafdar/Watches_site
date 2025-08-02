@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit,PLATFORM_ID,Inject } from '@angular/core';
+import { CommonModule,isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -22,7 +22,10 @@ import {
   heroCalendar,
   heroTruck,
   heroShieldCheck,
-  heroDocumentText
+  heroDocumentText,
+  heroChevronDown,
+  heroMagnifyingGlass,
+  heroArrowRight
 } from '@ng-icons/heroicons/outline';
 
 interface ProductImage {
@@ -90,7 +93,10 @@ interface ProductFormData {
     heroCalendar,
     heroTruck,
     heroShieldCheck,
-    heroDocumentText
+    heroDocumentText,
+    heroChevronDown,
+    heroMagnifyingGlass,
+    heroArrowRight
   })]
 })
 export class AddProductComponent implements OnInit {
@@ -106,6 +112,12 @@ export class AddProductComponent implements OnInit {
   maxImages = 10;
   maxFileSize = 5 * 1024 * 1024; // 5MB
   allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+   activePreviewTab = 0;
+  previewViews = [
+    { name: 'Grid View', description: 'How it appears in product listings' },
+    { name: 'Detail View', description: 'Product detail page layout' },
+    { name: 'List View', description: 'List view in product listings' }
+  ];
 
   // Form options
   categories = ['Luxury', 'Sport', 'Minimalist', 'Classic', 'Digital', 'Smartwatch'];
@@ -133,15 +145,50 @@ export class AddProductComponent implements OnInit {
     'Screw-down Crown'
   ];
 
+  // Enhanced dropdown state management
+  dropdownStates: { [key: string]: boolean } = {
+    category: false,
+    brand: false,
+    movement: false,
+    material: false,
+    waterResistance: false,
+    badge: false
+  };
+
+  // Search queries for filtering
+  searchQueries: { [key: string]: string } = {
+    category: '',
+    brand: '',
+    movement: '',
+    material: '',
+    waterResistance: '',
+    badge: ''
+  };
+
+  // Filtered options
+  filteredOptions: { [key: string]: string[] } = {};
+
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeForm();
+    this.initializeFilteredOptions();
   }
 
   ngOnInit() {
     this.loadDraftIfExists();
+    // Close dropdowns when clicking outside
+    if (isPlatformBrowser(this.platformId)) {
+      document.addEventListener('click', this.onDocumentClick.bind(this));
+    }
+  }
+
+  ngOnDestroy() {
+    if (isPlatformBrowser(this.platformId)) {
+      document.removeEventListener('click', this.onDocumentClick.bind(this));
+    }
   }
 
   initializeForm() {
@@ -205,6 +252,18 @@ export class AddProductComponent implements OnInit {
     });
   }
 
+  // Initialize filtered options
+  initializeFilteredOptions() {
+    this.filteredOptions = {
+      category: [...this.categories],
+      brand: [...this.brands],
+      movement: [...this.movements],
+      material: [...this.materials],
+      waterResistance: [...this.waterResistanceOptions],
+      badge: [...this.badges]
+    };
+  }
+
   // Step Navigation
   nextStep() {
     if (this.validateCurrentStep()) {
@@ -227,6 +286,7 @@ export class AddProductComponent implements OnInit {
   }
 
   validateCurrentStep(): boolean {
+    // console.log(`Validating step ${this.currentStep}`);
     switch (this.currentStep) {
       case 1:
         return this.validateBasicInfo();
@@ -409,26 +469,30 @@ export class AddProductComponent implements OnInit {
 
   // Form Actions
   saveDraft() {
-    const formData = this.productForm.value;
+    if(isPlatformBrowser(this.platformId)) {
+      const formData = this.productForm.value;
     localStorage.setItem('productDraft', JSON.stringify(formData));
     alert('Draft saved successfully!');
+    }
   }
 
   loadDraftIfExists() {
-    const draft = localStorage.getItem('productDraft');
+    if (isPlatformBrowser(this.platformId)) {
+      const draft = localStorage.getItem('productDraft');
     if (draft) {
       const formData = JSON.parse(draft);
       this.productForm.patchValue(formData);
     }
+    }
   }
 
   clearDraft() {
-    localStorage.removeItem('productDraft');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('productDraft');
+    }
   }
 
-  togglePreview() {
-    this.showPreview = !this.showPreview;
-  }
+  
 
   async saveProduct() {
     if (!this.productForm.valid || this.productImages.length === 0) {
@@ -505,6 +569,100 @@ export class AddProductComponent implements OnInit {
   isStepAccessible(step: number): boolean {
     return step <= this.currentStep;
   }
+
+  // Toggle dropdown visibility
+  toggleDropdown(dropdownName: string) {
+    // Close all other dropdowns
+    Object.keys(this.dropdownStates).forEach(key => {
+      if (key !== dropdownName) {
+        this.dropdownStates[key] = false;
+      }
+    });
+    
+    // Toggle the selected dropdown
+    this.dropdownStates[dropdownName] = !this.dropdownStates[dropdownName];
+    
+    // Reset search when opening
+    if (this.dropdownStates[dropdownName]) {
+      this.searchQueries[dropdownName] = '';
+      this.filterOptions(dropdownName);
+    }
+  }
+
+  // Close dropdown when clicking outside
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      Object.keys(this.dropdownStates).forEach(key => {
+        this.dropdownStates[key] = false;
+      });
+    }
+  }
+
+  // Filter options based on search query
+  filterOptions(dropdownName: string) {
+    debugger
+  const query = this.searchQueries[dropdownName]?.toLowerCase() || '';
+  const allOptions = this.getAllOptions(dropdownName);
+  
+  this.filteredOptions[dropdownName] = allOptions.filter(option =>
+    option.toLowerCase().includes(query)
+  );
+}
+
+  // Get all options for a dropdown
+  getAllOptions(dropdownName: string): string[] {
+    switch (dropdownName) {
+      case 'category': return this.categories;
+      case 'brand': return this.brands;
+      case 'movement': return this.movements;
+      case 'material': return this.materials;
+      case 'waterResistance': return this.waterResistanceOptions;
+      case 'badge': return this.badges;
+      default: return [];
+    }
+  }
+
+  // Get filtered options for display
+  getFilteredOptions(dropdownName: string): string[] {
+    return this.filteredOptions[dropdownName] || [];
+  }
+
+  // Select an option from dropdown
+  selectOption(dropdownName: string, value: string) {
+    this.productForm.patchValue({ [dropdownName]: value });
+    this.dropdownStates[dropdownName] = false;
+    this.searchQueries[dropdownName] = '';
+  }
+
+  // Get material color for visual representation
+  getMaterialColor(material: string): string {
+    const colors: { [key: string]: string } = {
+      'Stainless Steel': 'bg-gray-400',
+      'Gold': 'bg-yellow-400',
+      'Rose Gold': 'bg-pink-400',
+      'Titanium': 'bg-gray-500',
+      'Ceramic': 'bg-white border border-gray-300',
+      'Leather': 'bg-amber-600',
+      'Rubber': 'bg-gray-800'
+    };
+    return colors[material] || 'bg-gray-300';
+  }
+
+  // Get water resistance description
+  getWaterResistanceDescription(resistance: string): string {
+    const descriptions: { [key: string]: string } = {
+      '30m': 'Basic splash protection',
+      '50m': 'Light swimming',
+      '100m': 'Swimming and snorkeling',
+      '200m': 'Professional marine activity',
+      '300m': 'Saturation diving',
+      '500m': 'Professional diving',
+      '1000m': 'Deep sea diving'
+    };
+    return descriptions[resistance] || 'Water resistant';
+  }
+
   onFeatureChange(event: Event, feature: string) {
   const input = event.target as HTMLInputElement;
   if (input && input.checked) {
@@ -513,4 +671,40 @@ export class AddProductComponent implements OnInit {
     this.removeFeature(this.featuresArray.value.indexOf(feature));
   }
 }
+  getMainImage(): ProductImage | null {
+    return this.productImages.find(img => img.isMain) || this.productImages[0] || null;
+  }
+
+  getEmptyImageSlots(): any[] {
+    const emptySlots = Math.max(0, 4 - this.productImages.length);
+    return new Array(emptySlots).fill(null);
+  }
+
+  togglePreview() {
+    this.showPreview = !this.showPreview;
+    
+    // Reset to first tab when opening preview
+    if (this.showPreview) {
+      this.activePreviewTab = 0;
+    }
+  }
+
+  // Enhanced validation for preview
+  isPreviewReady(): boolean {
+    return !!(
+      this.productForm.get('name')?.value &&
+      this.productForm.get('price')?.value &&
+      this.productForm.get('category')?.value &&
+      this.productImages.length > 0
+    );
+  }
+
+  // Get preview status
+  getPreviewStatus(): string {
+    if (!this.productForm.get('name')?.value) return 'Product name is required for preview';
+    if (!this.productForm.get('price')?.value) return 'Price is required for preview';
+    if (!this.productForm.get('category')?.value) return 'Category is required for preview';
+    if (this.productImages.length === 0) return 'At least one image is required for preview';
+    return 'Preview ready';
+  }
 }
