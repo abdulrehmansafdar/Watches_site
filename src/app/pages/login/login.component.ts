@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
+
 import { 
   heroEye, 
   heroEyeSlash, 
@@ -12,11 +13,13 @@ import {
   heroArrowRight 
 } from '@ng-icons/heroicons/outline';
 import { ionLogoGoogle, ionLogoApple, ionLogoFacebook } from '@ng-icons/ionicons';
+import { ApiCallService } from '../../services/api-call.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface LoginForm {
   email: string;
   password: string;
-  rememberMe: boolean;
+ 
 }
 
 @Component({
@@ -44,10 +47,12 @@ export class LoginComponent {
   loginForm: LoginForm = {
     email: '',
     password: '',
-    rememberMe: false
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+    private apiCallService: ApiCallService,
+    private themeService: ThemeService
+  ) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -56,14 +61,26 @@ export class LoginComponent {
   onSubmit() {
     if (this.isFormValid()) {
       this.isLoading = true;
+      const payload ={
+        username: this.loginForm.email,
+        password: this.loginForm.password,
+      }
       
       // Simulate API call
-      setTimeout(() => {
-        console.log('Login submitted:', this.loginForm);
-        this.isLoading = false;
-        // Navigate to home or dashboard
-        this.router.navigate(['/otp']);
-      }, 2000);
+      this.apiCallService.PostcallWithoutToken('User/LoginUser', payload).subscribe({
+        next: (response) => {
+          console.log('Login successful', response);
+          this.themeService.shownotification('Login successful', 'success');
+          this.isLoading = false;
+          // localStorage.setItem('token', response.token); // Assuming the response contains a token
+            this.router.navigate(['/otp'], { queryParams: { email: this.loginForm.email } });
+        },
+        error: (error) => {
+          console.error('Login failed', error);
+          this.isLoading = false;
+          // Handle error appropriately, e.g., show a notification
+        }
+      });
     }
   }
 
@@ -76,8 +93,8 @@ export class LoginComponent {
     return !!(
       this.loginForm.email && 
       this.loginForm.password &&
-      this.loginForm.email.includes('@') &&
       this.loginForm.password.length >= 6
     );
   }
+  
 }

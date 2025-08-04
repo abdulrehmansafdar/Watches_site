@@ -18,6 +18,7 @@ export class ApiCallService {
   }
       
   gettokenHeader() {
+    debugger
     const token = localStorage.getItem('token');
     if (!token) {
       return new HttpHeaders({
@@ -25,8 +26,7 @@ export class ApiCallService {
         'Content-Type': 'application/json'
       });// If no token, return headers without Authorization
     }
-    return 
-       new HttpHeaders({
+    return new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`  

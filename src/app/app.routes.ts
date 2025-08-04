@@ -1,5 +1,7 @@
 import type { Routes } from "@angular/router"
 import { ContactComponent } from "./pages/contact/contact.component"
+import { AddProductComponent } from "./pages/add-product/add-product.component"
+import { authGuard } from "./guards/auth.guard"
 
 export const routes: Routes = [
   {
@@ -42,7 +44,8 @@ export const routes: Routes = [
   },
   {
     path: "add-product",
-    loadComponent: () => import("./pages/add-product/add-product.component").then((m) => m.AddProductComponent),
+    component: AddProductComponent,
+    canActivate:[authGuard]
   },
   {
     path: "**",
