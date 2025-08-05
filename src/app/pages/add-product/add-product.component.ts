@@ -1,9 +1,9 @@
-import { Component, OnInit,PLATFORM_ID,Inject } from '@angular/core';
-import { CommonModule,isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { 
+import {
   heroPlus,
   heroXMark,
   heroPhoto,
@@ -27,6 +27,7 @@ import {
   heroMagnifyingGlass,
   heroArrowRight
 } from '@ng-icons/heroicons/outline';
+import { ProductService } from '../../services/product.service';
 
 interface ProductImage {
   id: string;
@@ -44,15 +45,15 @@ interface ProductFormData {
   shortDescription: string;
   price: number;
   originalPrice: number;
-  category: string;
-  brand: string;
+  Category: string;
+  Brand: string;
   movement: string;
   material: string;
   caseDiameter: string;
-  waterResistance: string;
+  Resistance: string;
   features: string[];
   specifications: any;
-  badge: string;
+  Badge: string;
   inStock: boolean;
   stockQuantity: number;
   sku: string;
@@ -74,7 +75,7 @@ interface ProductFormData {
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIcon],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.scss',
-  viewProviders: [provideIcons({ 
+  viewProviders: [provideIcons({
     heroPlus,
     heroXMark,
     heroPhoto,
@@ -112,7 +113,7 @@ export class AddProductComponent implements OnInit {
   maxImages = 10;
   maxFileSize = 5 * 1024 * 1024; // 5MB
   allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-   activePreviewTab = 0;
+  activePreviewTab = 0;
   previewViews = [
     { name: 'Grid View', description: 'How it appears in product listings' },
     { name: 'Detail View', description: 'Product detail page layout' },
@@ -120,12 +121,12 @@ export class AddProductComponent implements OnInit {
   ];
 
   // Form options
-  categories = ['Luxury', 'Sport', 'Minimalist', 'Classic', 'Digital', 'Smartwatch'];
-  brands = ['Chronos', 'Omega', 'Rolex', 'Seiko', 'Casio', 'TAG Heuer', 'Breitling'];
-  movements = ['Automatic', 'Quartz', 'Manual', 'Solar', 'Kinetic'];
-  materials = ['Stainless Steel', 'Gold', 'Rose Gold', 'Titanium', 'Ceramic', 'Leather', 'Rubber'];
-  waterResistanceOptions = ['30m', '50m', '100m', '200m', '300m', '500m', '1000m'];
-  badges = ['Best Seller', 'New', 'Limited Edition', 'Popular', 'Trending', 'Premium', 'Hot Deal'];
+  Brands: any[] = [];
+  categories: any[] = [];
+  movements: any[] = [];
+  materials: any[] = [];
+  ResistanceOptions: any[] = [];
+  Badges: any[] = [];
 
   // Predefined features
   availableFeatures = [
@@ -147,22 +148,22 @@ export class AddProductComponent implements OnInit {
 
   // Enhanced dropdown state management
   dropdownStates: { [key: string]: boolean } = {
-    category: false,
-    brand: false,
+    Category: false,
+    Brand: false,
     movement: false,
     material: false,
-    waterResistance: false,
-    badge: false
+    Resistance: false,
+    Badge: false
   };
 
   // Search queries for filtering
   searchQueries: { [key: string]: string } = {
-    category: '',
-    brand: '',
+    Category: '',
+    Brand: '',
     movement: '',
     material: '',
-    waterResistance: '',
-    badge: ''
+    Resistance: '',
+    Badge: ''
   };
 
   // Filtered options
@@ -171,7 +172,8 @@ export class AddProductComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private productService: ProductService
   ) {
     this.initializeForm();
     this.initializeFilteredOptions();
@@ -197,24 +199,24 @@ export class AddProductComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       shortDescription: ['', [Validators.required, Validators.maxLength(150)]],
       description: ['', [Validators.required, Validators.minLength(20)]],
-      
+
       // Pricing
       price: [0, [Validators.required, Validators.min(1)]],
       originalPrice: [0],
-      
+
       // Classification
-      category: ['', Validators.required],
-      brand: ['', Validators.required],
-      badge: [''],
+      Category: ['', Validators.required],
+      Brand: ['', Validators.required],
+      Badge: [''],
       tags: this.fb.array([]),
-      
+
       // Technical Specs
       movement: ['', Validators.required],
       material: ['', Validators.required],
       caseDiameter: ['', Validators.required],
-      waterResistance: ['', Validators.required],
+      Resistance: ['', Validators.required],
       features: this.fb.array([]),
-      
+
       // Specifications
       specifications: this.fb.group({
         caseMaterial: [''],
@@ -225,7 +227,7 @@ export class AddProductComponent implements OnInit {
         jewels: [''],
         frequency: ['']
       }),
-      
+
       // Inventory
       inStock: [true],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
@@ -237,7 +239,7 @@ export class AddProductComponent implements OnInit {
         height: [0, Validators.min(0)]
       }),
       warranty: [24, [Validators.required, Validators.min(1)]],
-      
+
       // SEO
       seoTitle: [''],
       seoDescription: ['']
@@ -255,12 +257,12 @@ export class AddProductComponent implements OnInit {
   // Initialize filtered options
   initializeFilteredOptions() {
     this.filteredOptions = {
-      category: [...this.categories],
-      brand: [...this.brands],
+      Category: [...this.categories],
+      Brand: [...this.Brands],
       movement: [...this.movements],
       material: [...this.materials],
-      waterResistance: [...this.waterResistanceOptions],
-      badge: [...this.badges]
+      Resistance: [...this.ResistanceOptions],
+      Badge: [...this.Badges]
     };
   }
 
@@ -315,12 +317,12 @@ export class AddProductComponent implements OnInit {
   }
 
   validateBasicInfo(): boolean {
-    const controls = ['name', 'shortDescription', 'description', 'price', 'category', 'brand'];
+    const controls = ['name', 'shortDescription', 'description', 'price', 'Category', 'Brand'];
     return controls.every(control => this.productForm.get(control)?.valid);
   }
 
   validateTechnicalSpecs(): boolean {
-    const controls = ['movement', 'material', 'caseDiameter', 'waterResistance'];
+    const controls = ['movement', 'material', 'caseDiameter', 'Resistance'];
     return controls.every(control => this.productForm.get(control)?.valid);
   }
 
@@ -375,7 +377,7 @@ export class AddProductComponent implements OnInit {
 
     const reader = new FileReader();
     const imageId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    
+
     const productImage: ProductImage = {
       id: imageId,
       file: file,
@@ -399,7 +401,7 @@ export class AddProductComponent implements OnInit {
     if (index > -1) {
       const wasMain = this.productImages[index].isMain;
       this.productImages.splice(index, 1);
-      
+
       // If removed image was main, make first image main
       if (wasMain && this.productImages.length > 0) {
         this.productImages[0].isMain = true;
@@ -436,7 +438,7 @@ export class AddProductComponent implements OnInit {
   addTag(event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
     const tag = input.value.trim();
-    
+
     if (event.key === 'Enter' && tag && !this.tagsArray.value.includes(tag)) {
       this.tagsArray.push(this.fb.control(tag));
       input.value = '';
@@ -469,20 +471,20 @@ export class AddProductComponent implements OnInit {
 
   // Form Actions
   saveDraft() {
-    if(isPlatformBrowser(this.platformId)) {
+    if (isPlatformBrowser(this.platformId)) {
       const formData = this.productForm.value;
-    localStorage.setItem('productDraft', JSON.stringify(formData));
-    alert('Draft saved successfully!');
+      localStorage.setItem('productDraft', JSON.stringify(formData));
+      alert('Draft saved successfully!');
     }
   }
 
   loadDraftIfExists() {
     if (isPlatformBrowser(this.platformId)) {
       const draft = localStorage.getItem('productDraft');
-    if (draft) {
-      const formData = JSON.parse(draft);
-      this.productForm.patchValue(formData);
-    }
+      if (draft) {
+        const formData = JSON.parse(draft);
+        this.productForm.patchValue(formData);
+      }
     }
   }
 
@@ -492,7 +494,7 @@ export class AddProductComponent implements OnInit {
     }
   }
 
-  
+
 
   async saveProduct() {
     if (!this.productForm.valid || this.productImages.length === 0) {
@@ -572,18 +574,34 @@ export class AddProductComponent implements OnInit {
 
   // Toggle dropdown visibility
   toggleDropdown(dropdownName: string) {
-    // Close all other dropdowns
     Object.keys(this.dropdownStates).forEach(key => {
       if (key !== dropdownName) {
         this.dropdownStates[key] = false;
       }
     });
-    
-    // Toggle the selected dropdown
+
     this.dropdownStates[dropdownName] = !this.dropdownStates[dropdownName];
-    
-    // Reset search when opening
+
     if (this.dropdownStates[dropdownName]) {
+      this.productService.getDropdownData(dropdownName, `Get${dropdownName}s`).subscribe({
+        next: (response) => {
+          if (response.responseCode === 200) {
+            // Set the dropdown data
+            switch (dropdownName) {
+              case 'Brand': this.Brands = response.data; break;
+              case 'Category': this.categories = response.data; break;
+              case 'movement': this.movements = response.data; break;
+              case 'material': this.materials = response.data; break;
+              case 'Resistance': this.ResistanceOptions = response.data; break;
+              case 'Badge': this.Badges = response.data; break;
+            }
+            this.filteredOptions[dropdownName] = response.data.map((item: any) => item.name);
+          }
+        },
+        error: () => {
+          this.filteredOptions[dropdownName] = [];
+        }
+      });
       this.searchQueries[dropdownName] = '';
       this.filterOptions(dropdownName);
     }
@@ -602,23 +620,23 @@ export class AddProductComponent implements OnInit {
   // Filter options based on search query
   filterOptions(dropdownName: string) {
     debugger
-  const query = this.searchQueries[dropdownName]?.toLowerCase() || '';
-  const allOptions = this.getAllOptions(dropdownName);
-  
-  this.filteredOptions[dropdownName] = allOptions.filter(option =>
-    option.toLowerCase().includes(query)
-  );
-}
+    const query = this.searchQueries[dropdownName]?.toLowerCase() || '';
+    const allOptions = this.getAllOptions(dropdownName);
+
+    this.filteredOptions[dropdownName] = allOptions.filter(option =>
+      option.toLowerCase().includes(query)
+    );
+  }
 
   // Get all options for a dropdown
   getAllOptions(dropdownName: string): string[] {
     switch (dropdownName) {
-      case 'category': return this.categories;
-      case 'brand': return this.brands;
-      case 'movement': return this.movements;
-      case 'material': return this.materials;
-      case 'waterResistance': return this.waterResistanceOptions;
-      case 'badge': return this.badges;
+      case 'Category': return this.categories.map(c => c.name);
+      case 'Brand': return this.Brands.map(b => b.name);
+      case 'movement': return this.movements.map(m => m.name);
+      case 'material': return this.materials.map(m => m.name);
+      case 'Resistance': return this.ResistanceOptions.map(w => w.name);
+      case 'Badge': return this.Badges.map(b => b.name);
       default: return [];
     }
   }
@@ -650,7 +668,7 @@ export class AddProductComponent implements OnInit {
   }
 
   // Get water resistance description
-  getWaterResistanceDescription(resistance: string): string {
+  getResistanceDescription(resistance: string): string {
     const descriptions: { [key: string]: string } = {
       '30m': 'Basic splash protection',
       '50m': 'Light swimming',
@@ -664,13 +682,13 @@ export class AddProductComponent implements OnInit {
   }
 
   onFeatureChange(event: Event, feature: string) {
-  const input = event.target as HTMLInputElement;
-  if (input && input.checked) {
-    this.addFeature(feature);
-  } else {
-    this.removeFeature(this.featuresArray.value.indexOf(feature));
+    const input = event.target as HTMLInputElement;
+    if (input && input.checked) {
+      this.addFeature(feature);
+    } else {
+      this.removeFeature(this.featuresArray.value.indexOf(feature));
+    }
   }
-}
   getMainImage(): ProductImage | null {
     return this.productImages.find(img => img.isMain) || this.productImages[0] || null;
   }
@@ -682,7 +700,7 @@ export class AddProductComponent implements OnInit {
 
   togglePreview() {
     this.showPreview = !this.showPreview;
-    
+
     // Reset to first tab when opening preview
     if (this.showPreview) {
       this.activePreviewTab = 0;
@@ -694,7 +712,7 @@ export class AddProductComponent implements OnInit {
     return !!(
       this.productForm.get('name')?.value &&
       this.productForm.get('price')?.value &&
-      this.productForm.get('category')?.value &&
+      this.productForm.get('Category')?.value &&
       this.productImages.length > 0
     );
   }
@@ -703,7 +721,7 @@ export class AddProductComponent implements OnInit {
   getPreviewStatus(): string {
     if (!this.productForm.get('name')?.value) return 'Product name is required for preview';
     if (!this.productForm.get('price')?.value) return 'Price is required for preview';
-    if (!this.productForm.get('category')?.value) return 'Category is required for preview';
+    if (!this.productForm.get('Category')?.value) return 'Category is required for preview';
     if (this.productImages.length === 0) return 'At least one image is required for preview';
     return 'Preview ready';
   }
