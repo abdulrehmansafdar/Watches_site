@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { 
-  heroShieldCheck, 
+import {
+  heroShieldCheck,
   heroArrowLeft,
   heroArrowRight,
   heroClock,
   heroCheckCircle
 } from '@ng-icons/heroicons/outline';
+import { ApiCallService } from '../../services/api-call.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface OtpForm {
   otp: string[];
@@ -22,8 +24,8 @@ interface OtpForm {
   imports: [CommonModule, FormsModule, RouterModule, NgIcon],
   templateUrl: './otp.component.html',
   styleUrl: './otp.component.scss',
-  viewProviders: [provideIcons({ 
-    heroShieldCheck, 
+  viewProviders: [provideIcons({
+    heroShieldCheck,
     heroArrowLeft,
     heroArrowRight,
     heroClock,
@@ -36,12 +38,12 @@ export class OtpComponent implements OnInit, OnDestroy {
   otpExpired = false;
   otpVerified = false;
   Math = Math;
-  
+
   // Timer properties
-  timeRemaining = 300; // 5 minutes in seconds
-  timerDisplay = '5:00';
+  timeRemaining = 900; // 5 minutes in seconds
+  timerDisplay = '15:00';
   private timerInterval: any;
-  
+
   otpForm: OtpForm = {
     otp: ['', '', '', '', '', ''], // 6 digit OTP
     email: ''
@@ -49,15 +51,17 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private apiCallService: ApiCallService,
+    private themeService: ThemeService
+  ) { }
 
   ngOnInit() {
     // Get email from query parameters if passed from login
     this.route.queryParams.subscribe(params => {
       this.otpForm.email = params['email'] || 'user@example.com';
     });
-    
+
     this.startTimer();
   }
 
@@ -67,13 +71,13 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   startTimer() {
     this.clearTimer();
-    this.timeRemaining = 300; // Reset to 5 minutes
+    this.timeRemaining = 900; // Reset to 5 minutes
     this.otpExpired = false;
-    
+
     this.timerInterval = setInterval(() => {
       this.timeRemaining--;
       this.updateTimerDisplay();
-      
+
       if (this.timeRemaining <= 0) {
         this.otpExpired = true;
         this.clearTimer();
@@ -96,7 +100,7 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   onOtpInput(index: number, event: any) {
     let value = event.target.value;
-    
+
     // Only allow single digit numbers
     if (!/^\d$/.test(value) && value !== '') {
       event.target.value = this.otpForm.otp[index]; // Restore previous value
@@ -121,11 +125,12 @@ export class OtpComponent implements OnInit, OnDestroy {
   }
 
   onOtpKeyDown(index: number, event: KeyboardEvent) {
+    debugger
     // Handle number keys - allow them to replace current value
     if (/^\d$/.test(event.key)) {
       const input = event.target as HTMLInputElement;
       this.otpForm.otp[index] = event.key;
-      
+
       // Move to next field
       if (index < 5) {
         setTimeout(() => {
@@ -135,41 +140,57 @@ export class OtpComponent implements OnInit, OnDestroy {
           }
         }, 10);
       }
-      
+
       // Auto-submit if complete
       if (this.isOtpComplete() && !this.otpExpired) {
         setTimeout(() => this.onSubmit(), 300);
       }
-      
+
       event.preventDefault();
       return;
     }
 
     // Handle backspace
-    if (event.key === 'Backspace') {
-      event.preventDefault();
-      
-      if (this.otpForm.otp[index]) {
-        // Clear current field
-        this.otpForm.otp[index] = '';
-      } else if (index > 0) {
-        // Move to previous field and clear it
-        this.otpForm.otp[index - 1] = '';
-        const prevInput = document.querySelector(`input[data-index="${index - 1}"]`) as HTMLInputElement;
-        if (prevInput) {
-          prevInput.focus();
-        }
-      }
-      return;
+   if (event.key === 'Backspace') {
+  event.preventDefault();
+
+  const input = event.target as HTMLInputElement;
+
+  // Clear current field
+  this.otpForm.otp[index] = '';
+  input.value = '';
+
+  // Move focus to previous field if possible, but don't clear its value
+  if (index > 0) {
+    debugger
+    const prevInput = document.querySelector(`input[data-index="${index - 1}"]`) as HTMLInputElement;
+    if (prevInput) {
+      prevInput.focus();
+      prevInput.select(); // Cursor inside previous field, ready to overwrite
     }
-    
+  }
+  // If it's the first field, just clear it
+  else {
+  setTimeout(() => {
+    const firstInput = document.querySelector(`input[data-index="0"]`) as HTMLInputElement;
+    if (firstInput) {
+      this.otpForm.otp[0] = '';
+      firstInput.value = '';
+      firstInput.focus();
+      firstInput.select();
+    }
+  }, 0);
+}
+  return;
+}
+
     // Handle Delete key
-    if (event.key === 'Delete') {
-      event.preventDefault();
-      this.otpForm.otp[index] = '';
-      return;
-    }
-    
+    // if (event.key === 'Delete') {
+    //   event.preventDefault();
+    //   this.otpForm.otp[index] = '';
+    //   return;
+    // }
+
     // Handle Arrow keys
     if (event.key === 'ArrowLeft' && index > 0) {
       event.preventDefault();
@@ -179,7 +200,7 @@ export class OtpComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    
+
     if (event.key === 'ArrowRight' && index < 5) {
       event.preventDefault();
       const nextInput = document.querySelector(`input[data-index="${index + 1}"]`) as HTMLInputElement;
@@ -188,30 +209,30 @@ export class OtpComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    
+
     // Handle paste
     if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
       navigator.clipboard.readText().then(text => {
         const digits = text.replace(/\D/g, '').slice(0, 6).split('');
-        
+
         // Clear all fields first
         this.otpForm.otp = ['', '', '', '', '', ''];
-        
+
         // Fill with pasted digits
         digits.forEach((digit, i) => {
           if (i < 6) {
             this.otpForm.otp[i] = digit;
           }
         });
-        
+
         // Focus next empty field or last field
         const nextEmptyIndex = digits.length < 6 ? digits.length : 5;
         const targetInput = document.querySelector(`input[data-index="${nextEmptyIndex}"]`) as HTMLInputElement;
         if (targetInput) {
           targetInput.focus();
         }
-        
+
         // Auto-submit if all fields are filled
         if (digits.length === 6 && !this.otpExpired) {
           setTimeout(() => this.onSubmit(), 300);
@@ -219,7 +240,7 @@ export class OtpComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    
+
     // Prevent other keys
     if (!['Tab', 'Enter', 'Escape'].includes(event.key)) {
       event.preventDefault();
@@ -239,48 +260,56 @@ export class OtpComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.otpExpired) {
-      alert('OTP has expired. Please request a new one.');
-      return;
-    }
+    // if (this.otpExpired) {
+    //   alert('OTP has expired. Please request a new one.');
+    //   return;
+    // }
 
     this.isLoading = true;
-    
+    debugger
     // Simulate API call for OTP verification
-    setTimeout(() => {
-      const otpValue = this.getOtpValue();
-      console.log('OTP submitted:', otpValue);
-      
-      // Simulate successful verification (in real app, check with backend)
-      if (otpValue === '123456' || otpValue.length === 6) {
+    const payload = {
+      otp: this.getOtpValue(),
+      email: this.otpForm.email
+    };
+    this.apiCallService.PostcallWithoutToken('User/VerifyUser', payload).subscribe({
+      next: (response) => {
+        debugger
+        console.log('OTP verified successfully', response);
+        this.themeService.shownotification('OTP verified successfully', 'success');
+        this.isLoading = false;
         this.otpVerified = true;
-        this.clearTimer();
-        
-        // Show success state briefly then navigate
+        localStorage.setItem('token', response.data.token); // Assuming the response contains a token
+        // this.router.navigate(['/home']); // Navigate to home or dashboard
         setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1500);
-      } else {
-        alert('Invalid OTP. Please try again.');
-        this.clearOtp();
+          
+          this.otpVerified = false;
+          this.router.navigate(['/add-product']); // Navigate to home or dashboard
+        },  3000); // Delay for 1 second before navigating
+      },
+      error: (error) => {
+        console.error('OTP verification failed', error);
+        this.isLoading = false;
+        this.themeService.shownotification('OTP verification failed. Please try again.', 'error');
+        // Handle error appropriately, e.g., show a notification
       }
-      
-      this.isLoading = false;
-    }, 2000);
+    });
+
+
   }
 
   onResendOtp() {
     if (this.isResendingOtp) return;
-    
+
     this.isResendingOtp = true;
-    
+
     // Simulate API call for resending OTP
     setTimeout(() => {
       console.log('OTP resent to:', this.otpForm.email);
       this.startTimer(); // Restart timer
       this.clearOtp(); // Clear current OTP
       this.isResendingOtp = false;
-      
+
       // Show success message (in real app, use toast service)
       alert('New OTP sent to your email!');
     }, 1500);
@@ -288,12 +317,12 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   clearOtp() {
     this.otpForm.otp = ['', '', '', '', '', ''];
-    
+
     // Clear all input values
     document.querySelectorAll('.otp-input').forEach((input: any) => {
       input.value = '';
     });
-    
+
     // Focus first input
     setTimeout(() => {
       const firstInput = document.querySelector('input[data-index="0"]') as HTMLInputElement;
@@ -317,11 +346,11 @@ export class OtpComponent implements OnInit, OnDestroy {
     if (!email) return '';
     const [localPart, domain] = email.split('@');
     if (!domain) return email;
-    
-    const maskedLocal = localPart.length > 2 
+
+    const maskedLocal = localPart.length > 2
       ? localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1]
       : localPart;
-    
+
     return `${maskedLocal}@${domain}`;
   }
   onOtpFocus(event: Event) {

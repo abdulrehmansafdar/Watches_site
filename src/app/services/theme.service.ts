@@ -1,7 +1,7 @@
 import { Injectable ,Inject,PLATFORM_ID} from "@angular/core"
 import { isPlatformBrowser } from "@angular/common"
 import { BehaviorSubject } from "rxjs"
-
+import Swal from 'sweetalert2'
 @Injectable({
   providedIn: "root",
 })
@@ -42,5 +42,17 @@ export class ThemeService {
       localStorage.setItem("theme", "light")
     }
     }
+  }
+  shownotification(message: string, type: 'success' | 'error' = 'success',) {
+    Swal.fire({
+      theme: this.isDarkMode.value ? 'dark' : 'light',
+      title: type === 'success' ? 'Success' : 'Error',
+      text: message,
+      icon: type,
+      timer: 3000,
+      showConfirmButton: false,
+      position: 'top-end',
+      confirmButtonText: 'OK'
+    });
   }
 }
