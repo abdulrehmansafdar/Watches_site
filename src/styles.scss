@@ -4,27 +4,29 @@
 
 @layer base {
   :root {
-    /* Updated with softer, eye-friendly colors */
-    --background: 0 0% 96%;  /* Soft off-white instead of pure white */
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 97%;  /* Slightly warmer card background */
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 97%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 94%;  /* Softer secondary */
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 94%;  /* Warmer muted background */
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 94%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 89.4%;  /* Slightly more visible borders */
-    --input: 214.3 31.8% 89.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --background: 240 20% 98%;
+    /* soft off-white */
+    --foreground: 222 47% 11%;
+    /* dark gray for text */
+    --muted: 220 8% 70%;
+    /* light gray for muted backgrounds */
+    --muted-foreground: 220 10% 40%;
+    /* medium gray for muted text */
+    --card: 220 8% 92%; /* soft gray for cards */
+    /* white for cards */
+    --card-foreground: 222 47% 11%;
+    --popover: 220 14% 96%;
+    /* light gray for popovers */
+    --popover-foreground: 222 47% 11%;
+    --border: 220 13% 91%;
+    /* subtle border */
+    --input: 220 13% 91%;
+    --primary: 24 94% 50%;
+    /* your accent color */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -54,10 +56,11 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-  
+
 }
 
 input::-webkit-outer-spin-button,

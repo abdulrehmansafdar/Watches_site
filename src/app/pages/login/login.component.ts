@@ -69,14 +69,21 @@ export class LoginComponent {
       // Simulate API call
       this.apiCallService.PostcallWithoutToken('User/LoginUser', payload).subscribe({
         next: (response) => {
+          if (response.responseCode === 200) {
           console.log('Login successful', response);
           this.themeService.shownotification('Login successful', 'success');
           this.isLoading = false;
           // localStorage.setItem('token', response.token); // Assuming the response contains a token
             this.router.navigate(['/otp'], { queryParams: { email: this.loginForm.email } });
+          }
+          else {
+            this.themeService.shownotification(response.errorMessage, 'error');
+            this.isLoading = false;
+          }
         },
         error: (error) => {
-          console.error('Login failed', error);
+          this.themeService.shownotification('Login failed', 'error');
+          console.error('Login error', error);
           this.isLoading = false;
           // Handle error appropriately, e.g., show a notification
         }

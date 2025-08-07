@@ -117,113 +117,15 @@
 
               <!-- Category & Brand -->
               <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Category <span class="text-red-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <button type="button" (click)="toggleDropdown('Category')"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                      <span
-                        [class]="productForm.get('Category')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                        {{ productForm.get('Category')?.value || 'Select Category' }}
-                      </span>
-                      <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                        [class.rotate-180]="dropdownStates['Category']"></ng-icon>
-                    </button>
+                <custom-dropdown label="Category" placeholder="Select Category" dropdownName="Category"
+                  [selected]="productForm.get('Category')?.value" [required]="true"
+                  (select)="productForm.patchValue({ Category: $event })">
+                </custom-dropdown>
 
-                    <!-- Enhanced Dropdown Menu -->
-                    <div *ngIf="dropdownStates['Category']"
-                      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                      <!-- Search Input -->
-                      <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                        <div class="relative">
-                          <ng-icon name="heroMagnifyingGlass"
-                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
-                          <input type="text" placeholder="Search categories..." [(ngModel)]="searchQueries['Category']"
-                            [ngModelOptions]="{standalone: true}" (input)="filterOptions('Category')"
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
-                        </div>
-                      </div>
-
-                      <!-- Options List -->
-                      <div class="max-h-48 overflow-y-auto">
-                        <button type="button" *ngFor="let Category of getFilteredOptions('Category')"
-                          (click)="selectOption('Category', Category)"
-                          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                          <span
-                            class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                            {{ Category }}
-                          </span>
-                          <ng-icon *ngIf="productForm.get('Category')?.value === Category" name="heroCheck"
-                            class="w-4 h-4 text-primary"></ng-icon>
-                        </button>
-
-                        <!-- No Results -->
-                        <div *ngIf="getFilteredOptions('Category').length === 0"
-                          class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                          <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
-                          <p class="text-sm">No categories found</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Brand <span class="text-red-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <button type="button" (click)="toggleDropdown('Brand')"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                      <span
-                        [class]="productForm.get('Brand')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                        {{ productForm.get('Brand')?.value || 'Select Brand' }}
-                      </span>
-                      <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                        [class.rotate-180]="dropdownStates['Brand']"></ng-icon>
-                    </button>
-
-                    <!-- Enhanced Dropdown Menu -->
-                    <div *ngIf="dropdownStates['Brand']"
-                      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                      <!-- Search Input -->
-                      <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                        <div class="relative">
-                          <ng-icon name="heroMagnifyingGlass"
-                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
-                          <input type="text" placeholder="Search Brands..." [(ngModel)]="searchQueries['Brand']"
-                            [ngModelOptions]="{standalone: true}" (input)="filterOptions('Brand')"
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
-                        </div>
-                      </div>
-
-                      <!-- Options List -->
-                      <div class="max-h-48 overflow-y-auto">
-                        <button type="button" *ngFor="let Brand of getFilteredOptions('Brand')"
-                          (click)="selectOption('Brand', Brand)"
-                          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                          <span
-                            class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                            {{ Brand }}
-                          </span>
-                          <ng-icon *ngIf="productForm.get('Brand')?.value === Brand" name="heroCheck"
-                            class="w-4 h-4 text-primary"></ng-icon>
-                        </button>
-
-                        <!-- No Results -->
-                        <div *ngIf="getFilteredOptions('Brand').length === 0"
-                          class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                          <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
-                          <p class="text-sm">No Brands found</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <custom-dropdown label="Brand" placeholder="Select Brand" dropdownName="Brand"
+                  [selected]="productForm.get('Brand')?.value" [required]="true"
+                  (select)="productForm.patchValue({ Brand: $event })">
+                </custom-dropdown>
               </div>
             </div>
 
@@ -272,56 +174,10 @@
               <!-- Badge -->
               <!-- Badge Dropdown -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Product Badge
-                </label>
-                <div class="relative">
-                  <button type="button" (click)="toggleDropdown('Badge')"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                    <span [class]="productForm.get('Badge')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                      {{ productForm.get('Badge')?.value || 'Select Badge' }}
-                    </span>
-                    <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                      [class.rotate-180]="dropdownStates['Badge']"></ng-icon>
-                  </button>
-
-                  <!-- Dropdown Menu -->
-                  <div *ngIf="dropdownStates['Badge']"
-                    class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                    <!-- Search Input -->
-                    <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                      <div class="relative">
-                        <ng-icon name="heroMagnifyingGlass"
-                          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
-                        <input type="text" placeholder="Search badges..." [(ngModel)]="searchQueries['Badge']"
-                          [ngModelOptions]="{standalone: true}" (input)="filterOptions('Badge')"
-                          class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
-                      </div>
-                    </div>
-
-                    <!-- Options List -->
-                    <div class="max-h-48 overflow-y-auto">
-                      <button type="button" *ngFor="let badge of getFilteredOptions('Badge')"
-                        (click)="selectOption('Badge', badge)"
-                        class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                        <span
-                          class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                          {{ badge }}
-                        </span>
-                        <ng-icon *ngIf="productForm.get('Badge')?.value === badge" name="heroCheck"
-                          class="w-4 h-4 text-primary"></ng-icon>
-                      </button>
-
-                      <!-- No Results -->
-                      <div *ngIf="getFilteredOptions('Badge').length === 0"
-                        class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                        <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
-                        <p class="text-sm">No badges found</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <custom-dropdown label="Product Badge" placeholder="Select Badge" dropdownName="Badge"
+                  [selected]="productForm.get('Badge')?.value" [required]="true"
+                  (select)="productForm.patchValue({ Badge: $event })">
+                </custom-dropdown>
               </div>
             </div>
           </div>
@@ -363,118 +219,16 @@
             <div class="space-y-6">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Movement <span class="text-red-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <button type="button" (click)="toggleDropdown('movement')"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                      <span
-                        [class]="productForm.get('movement')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                        {{ productForm.get('movement')?.value || 'Select movement' }}
-                      </span>
-                      <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                        [class.rotate-180]="dropdownStates['movement']"></ng-icon>
-                    </button>
-
-                    <!-- Enhanced Dropdown Menu -->
-                    <div *ngIf="dropdownStates['movement']"
-                      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                      <!-- Search Input -->
-                      <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                        <div class="relative">
-                          <ng-icon name="heroMagnifyingGlass"
-                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
-                          <input type="text" placeholder="Search movements..." [(ngModel)]="searchQueries['movement']"
-                            [ngModelOptions]="{standalone: true}" (input)="filterOptions('movement')"
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
-                        </div>
-                      </div>
-
-                      <!-- Options List with Icons -->
-                      <div class="max-h-48 overflow-y-auto">
-                        <button type="button" *ngFor="let movement of getFilteredOptions('movement')"
-                          (click)="selectOption('movement', movement)"
-                          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                          <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                              <ng-icon name="heroWrench" class="w-4 h-4 text-primary"></ng-icon>
-                            </div>
-                            <span
-                              class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                              {{ movement }}
-                            </span>
-                          </div>
-                          <ng-icon *ngIf="productForm.get('movement')?.value === movement" name="heroCheck"
-                            class="w-4 h-4 text-primary"></ng-icon>
-                        </button>
-
-                        <!-- No Results -->
-                        <div *ngIf="getFilteredOptions('movement').length === 0"
-                          class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                          <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
-                          <p class="text-sm">No movements found</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <custom-dropdown label="Movement" placeholder="Select movement" dropdownName="movement"
+                    [selected]="productForm.get('movement')?.value" [required]="true"
+                    (select)="productForm.patchValue({ movement: $event })">
+                  </custom-dropdown>
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Material <span class="text-red-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <button type="button" (click)="toggleDropdown('material')"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                      <span
-                        [class]="productForm.get('material')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                        {{ productForm.get('material')?.value || 'Select material' }}
-                      </span>
-                      <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                        [class.rotate-180]="dropdownStates['material']"></ng-icon>
-                    </button>
-
-                    <!-- Enhanced Dropdown Menu -->
-                    <div *ngIf="dropdownStates['material']"
-                      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                      <!-- Search Input -->
-                      <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                        <div class="relative">
-                          <ng-icon name="heroMagnifyingGlass"
-                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
-                          <input type="text" placeholder="Search materials..." [(ngModel)]="searchQueries['material']"
-                            [ngModelOptions]="{standalone: true}" (input)="filterOptions('material')"
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
-                        </div>
-                      </div>
-
-                      <!-- Options List with Material Colors -->
-                      <div class="max-h-48 overflow-y-auto">
-                        <button type="button" *ngFor="let material of getFilteredOptions('material')"
-                          (click)="selectOption('material', material)"
-                          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                          <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full mr-3" [class]="getMaterialColor(material)"></div>
-                            <span
-                              class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                              {{ material }}
-                            </span>
-                          </div>
-                          <ng-icon *ngIf="productForm.get('material')?.value === material" name="heroCheck"
-                            class="w-4 h-4 text-primary"></ng-icon>
-                        </button>
-
-                        <!-- No Results -->
-                        <div *ngIf="getFilteredOptions('material').length === 0"
-                          class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                          <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
-                          <p class="text-sm">No materials found</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <custom-dropdown label="Material" placeholder="Select material" dropdownName="material"
+                    [selected]="productForm.get('material')?.value" [required]="true"
+                    [getOptionColor]="getMaterialColor" (select)="productForm.patchValue({ material: $event })">
+                  </custom-dropdown>
                 </div>
               </div>
 
@@ -487,50 +241,11 @@
                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Water Resistance <span class="text-red-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <button type="button" (click)="toggleDropdown('Resistance')"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
-                      <span
-                        [class]="productForm.get('Resistance')?.value ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
-                        {{ productForm.get('Resistance')?.value || 'Select resistance' }}
-                      </span>
-                      <ng-icon name="heroChevronDown" class="w-5 h-5 text-gray-400 transition-transform duration-200"
-                        [class.rotate-180]="dropdownStates['Resistance']"></ng-icon>
-                    </button>
-
-                    <!-- Enhanced Dropdown Menu -->
-                    <div *ngIf="dropdownStates['Resistance']"
-                      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
-
-                      <!-- Options List with Depth Indicators -->
-                      <div class="max-h-48 overflow-y-auto">
-                        <button type="button" *ngFor="let resistance of ResistanceOptions" title="{{getResistanceDescription(resistance.name)}}"
-                          (click)="selectOption('Resistance', resistance.name)"
-                          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
-                          <div class="flex items-center">
-                            <div
-                              class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
-                              <ng-icon name="heroShieldCheck" class="w-4 h-4 text-blue-600"></ng-icon>
-                            </div>
-                            <div >
-                              <span 
-                                class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
-                                {{ resistance.name }}
-                              </span>
-                              <p class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ getResistanceDescription(resistance.name) }}
-                              </p>
-                            </div>
-                          </div>
-                          <ng-icon *ngIf="productForm.get('Resistance')?.value === resistance" name="heroCheck"
-                            class="w-4 h-4 text-primary"></ng-icon>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <custom-dropdown label="Water Resistance" placeholder="Select resistance" dropdownName="Resistance"
+                    [selected]="productForm.get('Resistance')?.value" [required]="true"
+                    [getOptionDescription]="getResistanceDescription"
+                    (select)="productForm.patchValue({ Resistance: $event })">
+                  </custom-dropdown>
                 </div>
               </div>
 
@@ -579,13 +294,18 @@
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Crystal</label>
-                  <input type="text" formControlName="crystal" placeholder="e.g., Sapphire"
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strap Color</label>
+                  <input type="text" formControlName="strapColor" placeholder="e.g., Brown, Black"
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
                 </div>
               </div>
 
-              <div class="grid grid-cols-3 gap-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Crystal</label>
+                  <input type="text" formControlName="crystal" placeholder="e.g., Sapphire"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
+                </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Power
                     Reserve</label>
@@ -878,9 +598,11 @@
       </div>
       <button type="button" (click)="nextStep()" [disabled]="!validateCurrentStep()"
         class="inline-flex items-center px-6 py-3 bg-primary text-secondary rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-8">
-        Next Step
+        <span *ngIf="currentStep<totalSteps">Next Step</span>
+        <span *ngIf="currentStep===totalSteps">Submit</span>
         <ng-icon name="heroArrowRight" class="w-4 h-4 ml-2"></ng-icon>
       </button>
+      <p>Current Step: {{currentStep}}, Total Steps: {{totalSteps}}</p>
     </form>
   </div>
 </div>

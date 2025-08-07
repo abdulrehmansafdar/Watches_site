@@ -6,7 +6,6 @@ import { catchError, map } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 export const authGuard: CanActivateFn = (route, state) => {
   
-  debugger
   console.log('AuthGuard triggered');
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);

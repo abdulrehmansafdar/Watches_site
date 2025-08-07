@@ -5,22 +5,26 @@ import { FormsModule } from "@angular/forms"
 
 import { CardComponent, CardContentComponent } from "../../components/card/card.component"
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroMagnifyingGlass, heroEye, heroShoppingBag, heroXMark } from '@ng-icons/heroicons/outline';
+import { heroMagnifyingGlass, heroEye, heroShoppingBag, heroXMark, heroChevronLeft, heroChevronRight } from '@ng-icons/heroicons/outline';
 import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart } from "@ng-icons/ionicons"
+import { ApiCallService } from "../../services/api-call.service"
+import { LoaderService } from "../../services/loader.service"
 
 interface Product {
-  id: number
-  name: string
-  price: number
-  originalPrice?: number
-  image: string
-  rating: number
-  reviews: number
-  badge?: string
-  category: string
-  brand: string
-  movement: string
-  material: string
+  id: number;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;           // <-- Add this
+  mainImageUrl: string;
+  rating: number;
+  reviews: number;
+  badge?: string;
+  category: string;
+  brand: string;
+  movement: string;
+  material: string;
+  features?: string[];         // <-- Add this
 }
 
 @Component({
@@ -28,8 +32,8 @@ interface Product {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss',
-  viewProviders: [provideIcons({ 
-    heroMagnifyingGlass, 
+  viewProviders: [provideIcons({
+    heroMagnifyingGlass,
     ionGridOutline,
     ionFilter,
     ionList,
@@ -37,95 +41,51 @@ interface Product {
     ionHeart,
     heroEye,
     heroShoppingBag,
-    heroXMark
+    heroXMark,
+    heroChevronLeft,   // <-- add
+  heroChevronRight
   })]
 })
 export class ProductsComponent implements OnInit {
 
   Math = Math
-  
+  constructor(private apicall: ApiCallService,
+    private loader: LoaderService
+  ) { }
+
   searchQuery = ''
   sortBy = 'featured'
   viewMode: 'grid' | 'list' = 'grid'
   showMobileFilters = false
   priceRange = [0, 2000]
+  totalRecords = 0;
+  pageNumber = 1;
+  pageSize = 12;
 
-  categories = ['Luxury', 'Sport', 'Minimalist', 'Classic', 'Digital']
-  materials = ['Stainless Steel', 'Gold', 'Titanium', 'Ceramic', 'Leather']
-  
+  categories = []
+  brands = []
+
   selectedCategories: { [key: string]: boolean } = {}
-  selectedMaterials: { [key: string]: boolean } = {}
+  selectedBrands: { [key: string]: boolean } = {}
 
   allProducts: Product[] = [
-    {
-      id: 1,
-      name: "Chronos Elite",
-      price: 899,
-      originalPrice: 1299,
-      image: "/assets/d-1.webp",
-      rating: 4.8,
-      reviews: 124,
-      badge: "Best Seller",
-      category: "Luxury",
-      brand: "Chronos",
-      movement: "Automatic",
-      material: "Stainless Steel"
-    },
-    {
-      id: 2,
-      name: "Minimal Classic",
-      price: 299,
-      image: "/assets/d-2.webp",
-      rating: 4.6,
-      reviews: 89,
-      badge: "New",
-      category: "Minimalist",
-      brand: "Chronos",
-      movement: "Quartz",
-      material: "Stainless Steel"
-    },
-    {
-      id: 3,
-      name: "Sport Pro",
-      price: 599,
-      image: "/assets/d-3.webp",
-      rating: 4.9,
-      reviews: 156,
-      badge: "Popular",
-      category: "Sport",
-      brand: "Chronos",
-      movement: "Automatic",
-      material: "Titanium"
-    },
-    {
-      id: 4,
-      name: "Heritage Gold",
-      price: 1299,
-      image: "/assets/d-4.webp",
-      rating: 4.7,
-      reviews: 67,
-      badge: "Limited",
-      category: "Luxury",
-      brand: "Chronos",
-      movement: "Manual",
-      material: "Gold"
-    },
-   
   ]
 
   filteredProducts: Product[] = []
 
   ngOnInit() {
     this.filteredProducts = [...this.allProducts]
-    this.initializeFilters()
+    this.loadcategories()
+    this.loadBrands()
+    this.fetchProducts();
   }
 
   initializeFilters() {
     this.categories.forEach(category => {
       this.selectedCategories[category] = false
     })
-    this.materials.forEach(material => {
-      this.selectedMaterials[material] = false
+    this.brands.forEach(brand => {
+      this.selectedBrands[brand] = false
     })
   }
 
@@ -140,31 +100,22 @@ export class ProductsComponent implements OnInit {
   toggleFilters() {
     this.showMobileFilters = !this.showMobileFilters
   }
-
-  filterProducts() {
-    this.filteredProducts = this.allProducts.filter(product => {
-      // Search filter
-      const matchesSearch = !this.searchQuery || 
-        product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(this.searchQuery.toLowerCase())
-
-      // Price filter
-      const matchesPrice = product.price >= this.priceRange[0] && product.price <= this.priceRange[1]
-
-      // Category filter
-      const selectedCats = Object.keys(this.selectedCategories).filter(cat => this.selectedCategories[cat])
-      const matchesCategory = selectedCats.length === 0 || selectedCats.includes(product.category)
-
-      // Material filter
-      const selectedMats = Object.keys(this.selectedMaterials).filter(mat => this.selectedMaterials[mat])
-      const matchesMaterial = selectedMats.length === 0 || selectedMats.includes(product.material)
-
-      return matchesSearch && matchesPrice && matchesCategory && matchesMaterial
-    })
-
-    this.sortProducts()
+  get totalPages(): number {
+    return Math.ceil(this.totalRecords / this.pageSize) || 1;
   }
+
+  changePage(newPage: number) {
+    if (newPage < 1 || (newPage - 1) * this.pageSize >= this.totalRecords) return;
+    this.pageNumber = newPage;
+    this.fetchProducts();
+  }
+
+  onPageSizeChange(newSize: number) {
+    this.pageSize = +newSize;
+    this.pageNumber = 1;
+    this.fetchProducts();
+  }
+
 
   sortProducts() {
     switch (this.sortBy) {
@@ -186,16 +137,83 @@ export class ProductsComponent implements OnInit {
     }
   }
 
+  filterProducts() {
+    this.pageNumber = 1; // Reset to first page on filter
+    this.fetchProducts();
+  }
+
   clearFilters() {
-    this.searchQuery = ''
-    this.priceRange = [0, 2000]
-    this.initializeFilters()
-    this.filterProducts()
+    this.searchQuery = '';
+    this.priceRange = [0, 2000];
+    this.initializeFilters();
+    this.pageNumber = 1;
+    this.fetchProducts();
+  }
+  loadcategories() {
+    this.loader.show()
+    this.apicall.GetcallWithoutToken('Category/GetCategorys').subscribe((response: any) => {
+      if (response.responseCode === 200) {
+        this.categories = response.data.map((item: any) => item.name);
+        this.brands = response.data.map((category: any) => category.brand).filter((brand: string, index: number, self: string[]) => self.indexOf(brand) === index);
+        this.initializeFilters();
+        this.loader.hide();
+      }
+      else {
+
+        this.loader.hide();
+        console.error('Failed to load categories:', response.message);
+      }
+    }, (error: any) => {
+      console.error('Error loading categories:', error);
+      this.loader.hide();
+    });
+  }
+  loadBrands() {
+    this.loader.show();
+    this.apicall.GetcallWithoutToken('Brand/GetBrands').subscribe((response: any) => {
+      if (response.responseCode === 200) {
+        this.brands = response.data.map((item: any) => item.name);
+        this.initializeFilters();
+        this.loader.hide();
+      } else {
+        this.loader.hide();
+        console.error('Failed to load brands:', response.message);
+      }
+    }, (error: any) => {
+      console.error('Error loading brands:', error);
+      this.loader.hide();
+    });
   }
 
   // Add method to handle card click
   navigateToProduct(productId: number, event: Event) {
     // Navigate to product detail page
     // This will be handled by routerLink in template
+  }
+  fetchProducts() {
+    this.loader.show();
+    const selectedCats = Object.keys(this.selectedCategories).filter(cat => this.selectedCategories[cat]);
+    const selectedBrands = Object.keys(this.selectedBrands).filter(brand => this.selectedBrands[brand]);
+    const payload = {
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      searchTerm: this.searchQuery,
+      categories: selectedCats,
+      brands: selectedBrands,
+      minPrice: this.priceRange[0],
+      maxPrice: this.priceRange[1]
+    };
+    this.apicall.PostcallWithoutToken('Watch/GetWatches', payload).subscribe({
+      next: (response) => {
+        this.filteredProducts = response.data || [];
+        this.totalRecords = response.totalRecords || 0;
+        this.loader.hide();
+      },
+      error: () => {
+        this.filteredProducts = [];
+        this.totalRecords = 0;
+        this.loader.hide();
+      }
+    });
   }
 }

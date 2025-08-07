@@ -1,363 +1,36 @@
 <div class="min-h-screen bg-background">
-      <!-- Header -->
-      <div class="bg-muted/50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 class="text-4xl font-light text-foreground mb-4">All Timepieces</h1>
-          <p class="text-lg text-muted-foreground">Discover our complete collection of meticulously crafted watches</p>
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
-          <!-- Desktop Sidebar -->
-          <div class="hidden lg:block w-64 flex-shrink-0">
-            <div class="sticky top-24 space-y-6">
-              <!-- Search -->
-              <div class="relative">
-                <ng-icon name="heroMagnifyingGlass" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"></ng-icon>
-                <input
-                  type="text"
-                  placeholder="Search watches..."
-                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
-                  [(ngModel)]="searchQuery"
-                  (ngModelChange)="filterProducts()"
-                />
-              </div>
-
-              <!-- Price Range -->
-              <div>
-                <h3 class="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
-                <div class="space-y-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="2000"
-                    step="50"
-                    [(ngModel)]="priceRange[0]"
-                    (ngModelChange)="filterProducts()"
-                    class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max="2000"
-                    step="50"
-                    [(ngModel)]="priceRange[1]"
-                    (ngModelChange)="filterProducts()"
-                    class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div class="flex justify-between text-sm text-muted-foreground">
-                    <span>\${{ priceRange[0] }}</span>
-                    <span>\${{ priceRange[1] }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Categories -->
-              <div>
-                <h3 class="text-lg font-semibold mb-4 text-foreground">Category</h3>
-                <div class="space-y-2">
-                  <label *ngFor="let category of categories" class="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      [(ngModel)]="selectedCategories[category]"
-                      (ngModelChange)="filterProducts()"
-                      class="rounded border-border text-primary focus:ring-primary"
-                    />
-                    <span class="text-sm text-foreground">{{ category }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Materials -->
-              <div>
-                <h3 class="text-lg font-semibold mb-4 text-foreground">Material</h3>
-                <div class="space-y-2">
-                  <label *ngFor="let material of materials" class="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      [(ngModel)]="selectedMaterials[material]"
-                      (ngModelChange)="filterProducts()"
-                      class="rounded border-border text-primary focus:ring-primary"
-                    />
-                    <span class="text-sm text-foreground">{{ material }}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Main Content -->
-          <div class="flex-1">
-            <!-- Controls -->
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center space-x-4">
-                <button (click)="toggleFilters()" class="lg:hidden inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                  <ng-icon name="ionFilter" class="w-4 h-4 mr-2"></ng-icon>
-                  Filters
-                </button>
-                <span class="text-sm text-muted-foreground">{{ filteredProducts.length }} products</span>
-              </div>
-
-              <div class="flex items-center space-x-4">
-                <select [(ngModel)]="sortBy" (ngModelChange)="sortProducts()" class="border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-                  <option value="featured">Featured</option>
-                  <option value="newest">Newest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
-                </select>
-
-                <div class="flex border border-border rounded-md">
-                  <button
-                    [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'grid' ? 'bg-accent' : '')"
-                    (click)="viewMode = 'grid'"
-                  >
-                    <ng-icon name="ionGridOutline" class="w-4 h-4"></ng-icon>
-                  </button>
-                  <button
-                    [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'list' ? 'bg-accent' : '')"
-                    (click)="viewMode = 'list'"
-                  >
-                    <ng-icon name="ionList" class="w-4 h-4"></ng-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Products Grid/List -->
-            <div [ngClass]="viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6' : 'space-y-6'">
-              <!-- Compact Grid View Card -->
-              <ui-card
-                *ngFor="let product of filteredProducts"
-                [routerLink]="['/products', product.id]"
-                [ngClass]="viewMode === 'grid' ? 'group cursor-pointer bg-card dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1' : ''"
-                [class.hidden]="viewMode === 'list'"
-              >
-                <div class="relative overflow-hidden">
-                  <div class="relative overflow-hidden bg-gradient-to-br from-gray-100/80 to-gray-200/60 dark:from-gray-800 dark:to-gray-700 aspect-[4/5]">
-                    <img
-                      [src]="product.image"
-                      [alt]="product.name"
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                  </div>
-                  
-                  <!-- Compact badge -->
-                  <div *ngIf="product.badge" class="absolute top-2 left-2 z-10">
-                    <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-card/98 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-md backdrop-blur-md border border-gray-200/30">
-                      <div class="w-1.5 h-1.5 rounded-full bg-primary mr-1"></div>
-                      {{ product.badge }}
-                    </div>
-                  </div>
-                  
-                  <!-- Compact action buttons -->
-                  <div class="absolute top-2 right-2 z-10 flex space-x-1 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    <button (click)="$event.stopPropagation()" class="w-8 h-8 rounded-full bg-card/98 dark:bg-gray-900/95 backdrop-blur-md shadow-md hover:shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-gray-200/30">
-                      <ng-icon name="ionHeart" class="w-4 h-4"></ng-icon>
-                    </button>
-                  </div>
-                </div>
-                
-                <ui-card-content class="space-y-3 bg-card dark:bg-gray-900 p-4">
-                  <!-- Compact rating and reviews -->
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-1">
-                      <div class="flex items-center space-x-0.5">
-                        <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-3 h-3 text-amber-400 fill-current"></ng-icon>
-                        <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-3 h-3 text-gray-300 dark:text-gray-600"></ng-icon>
-                      </div>
-                      <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
-                    </div>
-                    <div class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                      {{ product.reviews }}
-                    </div>
-                  </div>
-                  
-                  <!-- Compact product info -->
-                  <div class="space-y-1">
-                    <h3 class="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
-                      {{ product.name }}
-                    </h3>
-                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      {{ product.category }} • {{ product.brand }}
-                    </p>
-                  </div>
-                  
-                  <!-- Compact pricing -->
-                  <div class="pt-2 border-t border-border/60">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-baseline space-x-1">
-                        <span class="text-lg font-bold text-foreground">
-                          ${{ product.price }}
-                        </span>
-                        <span *ngIf="product.originalPrice" class="text-sm text-muted-foreground line-through">
-                          ${{ product.originalPrice }}
-                        </span>
-                      </div>
-                      <div *ngIf="product.originalPrice" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">
-                        -{{ Math.round((1 - product.price / product.originalPrice) * 100) }}%
-                      </div>
-                    </div>
-                  </div>
-                </ui-card-content>
-              </ui-card>
-
-              <!-- List View Card -->
-              <ui-card
-                *ngFor="let product of filteredProducts"
-                [routerLink]="['/product', product.id]"
-                [class.hidden]="viewMode === 'grid'"
-                class="group cursor-pointer bg-card dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1"
-              >
-                <div class="flex">
-                  <!-- Image Section -->
-                  <div class="relative w-48 flex-shrink-0 overflow-hidden">
-                    <div class="relative overflow-hidden bg-gradient-to-br from-gray-100/80 to-gray-200/60 dark:from-gray-800 dark:to-gray-700 aspect-[4/5]">
-                      <img
-                        [src]="product.image"
-                        [alt]="product.name"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                    </div>
-                    
-                    <!-- Badge -->
-                    <div *ngIf="product.badge" class="absolute top-2 left-2 z-10">
-                      <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-card/98 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-md backdrop-blur-md border border-gray-200/30">
-                        <div class="w-1.5 h-1.5 rounded-full bg-primary mr-1"></div>
-                        {{ product.badge }}
-                      </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                      <button (click)="$event.stopPropagation()" class="w-8 h-8 rounded-full bg-card/98 dark:bg-gray-900/95 backdrop-blur-md shadow-md hover:shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-gray-200/30">
-                        <ng-icon name="ionHeart" class="w-4 h-4"></ng-icon>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- Content Section -->
-                  <ui-card-content class="flex-1 p-6 flex flex-col justify-between">
-                    <div class="space-y-3">
-                      <!-- Rating and Category -->
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                          <div class="flex items-center space-x-0.5">
-                            <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar" class="w-4 h-4 text-amber-400 fill-current"></ng-icon>
-                            <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar" class="w-4 h-4 text-gray-300 dark:text-gray-600"></ng-icon>
-                          </div>
-                          <span class="text-sm font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
-                          <span class="text-sm text-muted-foreground">({{ product.reviews }} reviews)</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                          <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium">
-                            {{ product.category }}
-                          </span>
-                          <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium">
-                            {{ product.material }}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <!-- Product Name and Brand -->
-                      <div>
-                        <h3 class="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight mb-1">
-                          {{ product.name }}
-                        </h3>
-                        <p class="text-sm text-muted-foreground font-semibold">
-                          {{ product.brand }} • {{ product.movement }}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <!-- Pricing -->
-                    <div class="pt-4 border-t border-border/60 mt-auto">
-                      <div class="flex items-center space-x-3">
-                        <span class="text-2xl font-bold text-foreground">
-                          ${{ product.price }}
-                        </span>
-                        <span *ngIf="product.originalPrice" class="text-lg text-muted-foreground line-through">
-                          ${{ product.originalPrice }}
-                        </span>
-                        <div *ngIf="product.originalPrice" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                          -{{ Math.round((1 - product.price / product.originalPrice) * 100) }}%
-                        </div>
-                      </div>
-                    </div>
-                  </ui-card-content>
-                </div>
-              </ui-card>
-            </div>
-
-            <!-- No Results -->
-            <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
-              <div class="mb-6">
-                <div class="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
-                  <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 text-muted-foreground"></ng-icon>
-                </div>
-                <p class="text-muted-foreground text-lg mb-2">No products found matching your criteria.</p>
-                <p class="text-sm text-muted-foreground">Try adjusting your filters or search terms.</p>
-              </div>
-              <button (click)="clearFilters()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                Clear All Filters
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Header -->
+  <div class="bg-muted/50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-light text-foreground mb-4">All Timepieces</h1>
+      <p class="text-lg text-muted-foreground">Discover our complete collection of meticulously crafted watches</p>
     </div>
+  </div>
 
-    <!-- Mobile Filters Sidebar -->
-    <div *ngIf="showMobileFilters" class="fixed inset-0 z-50 md:hidden">
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="toggleFilters()"></div>
-      <div class="fixed left-0 top-0 h-full w-80 bg-background border-r border-border shadow-2xl overflow-y-auto">
-        <div class="p-6 space-y-6">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-foreground">Filters</h2>
-            <button (click)="toggleFilters()" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
-              <ng-icon name="heroXMark" class="w-5 h-5"></ng-icon>
-            </button>
-          </div>
-          
-          <!-- Mobile Search -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Desktop Sidebar -->
+      <div class="hidden lg:block w-64 flex-shrink-0">
+        <div class="sticky top-24 space-y-6">
+          <!-- Search -->
           <div class="relative">
-            <ng-icon name="heroMagnifyingGlass" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"></ng-icon>
-            <input
-              type="text"
-              placeholder="Search watches..."
+            <ng-icon name="heroMagnifyingGlass"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"></ng-icon>
+            <input type="text" placeholder="Search watches..."
               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
-              [(ngModel)]="searchQuery"
-              (ngModelChange)="filterProducts()"
-            />
+              [(ngModel)]="searchQuery" (ngModelChange)="filterProducts()" />
           </div>
 
-          <!-- Mobile Price Range -->
+          <!-- Price Range -->
           <div>
             <h3 class="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
             <div class="space-y-2">
-              <input
-                type="range"
-                min="0"
-                max="2000"
-                step="50"
-                [(ngModel)]="priceRange[0]"
+              <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[0]"
                 (ngModelChange)="filterProducts()"
-                class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-              />
-              <input
-                type="range"
-                min="0"
-                max="2000"
-                step="50"
-                [(ngModel)]="priceRange[1]"
+                class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
+              <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[1]"
                 (ngModelChange)="filterProducts()"
-                class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-              />
+                class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
               <div class="flex justify-between text-sm text-muted-foreground">
                 <span>\${{ priceRange[0] }}</span>
                 <span>\${{ priceRange[1] }}</span>
@@ -365,44 +38,395 @@
             </div>
           </div>
 
-          <!-- Mobile Categories -->
+          <!-- Categories -->
           <div>
             <h3 class="text-lg font-semibold mb-4 text-foreground">Category</h3>
             <div class="space-y-2">
               <label *ngFor="let category of categories" class="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="selectedCategories[category]"
-                  (ngModelChange)="filterProducts()"
-                  class="rounded border-border text-primary focus:ring-primary"
-                />
+                <input type="checkbox" [(ngModel)]="selectedCategories[category]" (ngModelChange)="filterProducts()"
+                  class="rounded border-border text-primary focus:ring-primary" />
                 <span class="text-sm text-foreground">{{ category }}</span>
               </label>
             </div>
           </div>
 
-          <!-- Mobile Materials -->
+          <!-- Materials -->
           <div>
-            <h3 class="text-lg font-semibold mb-4 text-foreground">Material</h3>
+            <h3 class="text-lg font-semibold mb-4 text-foreground">Brands</h3>
             <div class="space-y-2">
-              <label *ngFor="let material of materials" class="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="selectedMaterials[material]"
-                  (ngModelChange)="filterProducts()"
-                  class="rounded border-border text-primary focus:ring-primary"
-                />
-                <span class="text-sm text-foreground">{{ material }}</span>
+              <label *ngFor="let brand of brands" class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="selectedBrands[brand]" (ngModelChange)="filterProducts()"
+                  class="rounded border-border text-primary focus:ring-primary" />
+                <span class="text-sm text-foreground">{{ brand }}</span>
               </label>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Apply Filters Button -->
-          <div class="pt-6 border-t border-border">
-            <button (click)="toggleFilters()" class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-xl font-semibold text-sm shadow-md hover:shadow-xl transition-all duration-300">
-              Apply Filters
+      <!-- Main Content -->
+      <div class="flex-1">
+        <!-- Controls -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-4">
+            <button (click)="toggleFilters()"
+              class="lg:hidden inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+              <ng-icon name="ionFilter" class="w-4 h-4 mr-2"></ng-icon>
+              Filters
             </button>
+            <span class="text-sm text-muted-foreground">{{ filteredProducts.length }} products</span>
           </div>
+
+          <div class="flex items-center space-x-4">
+            <select [(ngModel)]="sortBy" (ngModelChange)="sortProducts()"
+              class="border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+              <option value="featured">Featured</option>
+              <option value="newest">Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+
+            <div class="flex border border-border rounded-md">
+              <button
+                [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'grid' ? 'bg-accent' : '')"
+                (click)="viewMode = 'grid'">
+                <ng-icon name="ionGridOutline" class="w-4 h-4"></ng-icon>
+              </button>
+              <button
+                [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 ' + (viewMode === 'list' ? 'bg-accent' : '')"
+                (click)="viewMode = 'list'">
+                <ng-icon name="ionList" class="w-4 h-4"></ng-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Grid/List -->
+        <div [ngClass]="viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6' : 'space-y-6'">
+          <!-- Compact Grid View Card -->
+          <ui-card *ngFor="let product of filteredProducts" [routerLink]="['/products', product.id]"
+            [ngClass]="viewMode === 'grid' ? 'group cursor-pointer bg-card dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1' : ''"
+            [class.hidden]="viewMode === 'list'">
+            <div class="relative overflow-hidden">
+              <div
+                class="relative overflow-hidden bg-gradient-to-br from-gray-100/80 to-gray-200/60 dark:from-gray-800 dark:to-gray-700 aspect-[4/5]">
+                <img [src]="product.mainImageUrl" [alt]="product.name"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy" />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                </div>
+              </div>
+
+              <!-- Compact badge -->
+              <div *ngIf="product.badge" class="absolute top-2 left-2 z-10">
+                <div
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-card/98 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-md backdrop-blur-md border border-gray-200/30">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary mr-1"></div>
+                  {{ product.badge }}
+                </div>
+              </div>
+
+              <!-- Compact action buttons -->
+              <div
+                class="absolute top-2 right-2 z-10 flex space-x-1 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                <button (click)="$event.stopPropagation()"
+                  class="w-8 h-8 rounded-full bg-card/98 dark:bg-gray-900/95 backdrop-blur-md shadow-md hover:shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-gray-200/30">
+                  <ng-icon name="ionHeart" class="w-4 h-4"></ng-icon>
+                </button>
+              </div>
+            </div>
+
+            <ui-card-content class="space-y-3 bg-card dark:bg-gray-900 p-4">
+              <!-- Compact rating and reviews -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-1">
+                  <div class="flex items-center space-x-0.5">
+                    <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar"
+                      class="w-3 h-3 text-amber-400 fill-current"></ng-icon>
+                    <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar"
+                      class="w-3 h-3 text-gray-300 dark:text-gray-600"></ng-icon>
+                  </div>
+                  <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
+                </div>
+                <div class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                  {{ product.reviews }}
+                </div>
+              </div>
+
+              <!-- Compact product info -->
+              <div class="space-y-1">
+                <h3
+                  class="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
+                  {{ product.name }}
+                </h3>
+                <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  {{ product.category }} • {{ product.brand }}
+                </p>
+              </div>
+
+              <!-- Compact pricing -->
+              <div class="pt-2 border-t border-border/60">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-baseline justify-between w-[100%]">
+                    <span>
+                      <span class="text-lg font-bold text-primary">${{ product.price }}</span>
+                      <span *ngIf="product.originalPrice" class="text-xs line-through text-muted-foreground ml-2">${{
+                        product.originalPrice }}</span>
+                    </span>
+                    <span *ngIf="product.discount"
+                      class="ml-2 text-xs text-white bg-red-500 py-1 px-2 rounded-xl font-semibold">-{{
+                      product.discount | number:'1.0-0' }}%</span>
+                  </div>
+                </div>
+                <div *ngIf="product.features?.length" class="mt-2">
+                  <span class="text-xs text-muted-foreground">Features:</span>
+                  <span class="text-xs text-foreground">{{ product.features?.join(', ') }}</span>
+                </div>
+              </div>
+            </ui-card-content>
+          </ui-card>
+
+          <!-- List View Card -->
+          <ui-card *ngFor="let product of filteredProducts" [routerLink]="['/product', product.id]"
+            [class.hidden]="viewMode === 'grid'"
+            class="group cursor-pointer bg-card dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-lg transition-all duration-500 overflow-hidden border border-gray-200/60 dark:border-gray-800 hover:border-primary/20 backdrop-blur-sm hover:-translate-y-1">
+            <div class="flex">
+              <!-- Image Section -->
+              <div class="relative w-48 flex-shrink-0 overflow-hidden">
+                <div
+                  class="relative overflow-hidden bg-gradient-to-br from-gray-100/80 to-gray-200/60 dark:from-gray-800 dark:to-gray-700 aspect-[4/5]">
+                  <img [src]="product.mainImageUrl" [alt]="product.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy" />
+                  <div
+                    class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  </div>
+                </div>
+
+                <!-- Badge -->
+                <div *ngIf="product.badge" class="absolute top-2 left-2 z-10">
+                  <div
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-card/98 dark:bg-gray-900/95 text-gray-900 dark:text-white shadow-md backdrop-blur-md border border-gray-200/30">
+                    <div class="w-1.5 h-1.5 rounded-full bg-primary mr-1"></div>
+                    {{ product.badge }}
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div
+                  class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <button (click)="$event.stopPropagation()"
+                    class="w-8 h-8 rounded-full bg-card/98 dark:bg-gray-900/95 backdrop-blur-md shadow-md hover:shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-red-500 hover:scale-110 transition-all duration-300 border border-gray-200/30">
+                    <ng-icon name="ionHeart" class="w-4 h-4"></ng-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Content Section -->
+              <ui-card-content class="flex-1 p-6 flex flex-col justify-between">
+                <div class="space-y-3">
+                  <!-- Rating and Category -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="flex items-center space-x-0.5">
+                        <ng-icon *ngFor="let star of getStars(product.rating)" name="ionStar"
+                          class="w-4 h-4 text-amber-400 fill-current"></ng-icon>
+                        <ng-icon *ngFor="let star of getEmptyStars(product.rating)" name="ionStar"
+                          class="w-4 h-4 text-gray-300 dark:text-gray-600"></ng-icon>
+                      </div>
+                      <span class="text-sm font-semibold text-amber-600 dark:text-amber-400">{{ product.rating }}</span>
+                      <span class="text-sm text-muted-foreground">({{ product.reviews }} reviews)</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium">
+                        {{ product.category }}
+                      </span>
+                      <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium">
+                        {{ product.material }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Product Name and Brand -->
+                  <div>
+                    <h3
+                      class="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight mb-1">
+                      {{ product.name }}
+                    </h3>
+                    <p class="text-sm text-muted-foreground font-semibold">
+                      {{ product.brand }} • {{ product.movement }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Pricing -->
+                <div class="pt-4 border-t border-border/60 mt-auto">
+                  <div class="flex items-center justify-between w-[100%]">
+                    <span>
+                      <span class="text-2xl font-bold text-foreground">
+                        ${{ product.price }}
+                      </span>
+                      <span *ngIf="product.originalPrice" class="text-lg text-muted-foreground line-through">
+                        ${{ product.originalPrice }}
+                      </span>
+                    </span>
+                    <span *ngIf="product.discount"
+                      class="ml-2 text-xs text-white bg-red-500 py-1 px-2 rounded-xl font-semibold">-{{
+                      product.discount | number:'1.0-0' }}%</span>
+                  </div>
+                </div>
+              </ui-card-content>
+            </div>
+          </ui-card>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex items-center bg-muted justify-between mt-8 p-8 rounded-2xl" *ngIf="totalRecords > 0">
+          <div>
+            <span class="text-sm text-muted-foreground">
+              Showing {{ ((pageNumber - 1) * pageSize) + 1 }} -
+              {{ Math.min(pageNumber * pageSize, totalRecords) }} of {{ totalRecords }} products
+            </span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <!-- Prev Button -->
+            <button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber === 1"
+              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white disabled:opacity-40 flex items-center disabled:cursor-not-allowed">
+              <ng-icon name="heroChevronLeft" class="w-4 h-4 mr-1"></ng-icon>
+              Prev
+            </button>
+
+            <!-- First Page -->
+            <button *ngIf="pageNumber > 3" (click)="changePage(1)"
+              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white"
+              [class.bg-primary]="pageNumber === 1" [class.text-white]="pageNumber === 1"
+              [class.font-bold]="pageNumber === 1">1</button>
+            <span *ngIf="pageNumber > 4" class="px-2 text-muted-foreground">...</span>
+
+            <!-- Page Numbers Around Current -->
+            <ng-container *ngFor="let p of [].constructor(totalPages); let i = index">
+              <button *ngIf="i + 1 >= pageNumber - 2 && i + 1 <= pageNumber + 2" (click)="changePage(i + 1)"
+                class="px-3 py-2 rounded-full border border-border bg-secondary text-foreground shadow transition-all duration-200 hover:bg-seconday hover:text-primary mx-1"
+                [class.bg-primary]="pageNumber === (i + 1)"[class.text-white]="pageNumber === (i + 1)" 
+                [class.font-bold]="pageNumber === (i + 1)" [class.shadow-lg]="pageNumber === (i + 1)">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+
+            <!-- Ellipsis and Last Page -->
+            <span *ngIf="pageNumber < totalPages - 3" class="px-2 text-muted-foreground">...</span>
+            <button *ngIf="pageNumber < totalPages - 2" (click)="changePage(totalPages)"
+              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white"
+              [class.bg-primary]="pageNumber === totalPages" [class.text-white]="pageNumber === totalPages"
+              [class.font-bold]="pageNumber === totalPages">
+              {{ totalPages }}
+            </button>
+
+            <!-- Next Button -->
+            <button (click)="changePage(pageNumber + 1)" [disabled]="pageNumber * pageSize >= totalRecords"
+              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white disabled:opacity-40 flex items-center disabled:cursor-not-allowed">
+              Next
+              <ng-icon name="heroChevronRight" class="w-4 h-4 ml-1"></ng-icon>
+            </button>
+
+            <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)"
+              class="ml-4 border bg-secondary text-primary border-border rounded px-6 py-3 text-sm shadow">
+              <option [value]="6">6</option>
+              <option [value]="12">12</option>
+              <option [value]="24">24</option>
+              <option [value]="48">48</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
+          <div class="mb-6">
+            <div class="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
+              <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 text-muted-foreground"></ng-icon>
+            </div>
+            <p class="text-muted-foreground text-lg mb-2">No products found matching your criteria.</p>
+            <p class="text-sm text-muted-foreground">Try adjusting your filters or search terms.</p>
+          </div>
+          <button (click)="clearFilters()"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+            Clear All Filters
+          </button>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Mobile Filters Sidebar -->
+<div *ngIf="showMobileFilters" class="fixed inset-0 z-50 md:hidden">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="toggleFilters()"></div>
+  <div class="fixed left-0 top-0 h-full w-80 bg-background border-r border-border shadow-2xl overflow-y-auto">
+    <div class="p-6 space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-foreground">Filters</h2>
+        <button (click)="toggleFilters()"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+          <ng-icon name="heroXMark" class="w-5 h-5"></ng-icon>
+        </button>
+      </div>
+
+      <!-- Mobile Search -->
+      <div class="flex items-center mb-4">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search watches..."
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          (keyup.enter)="filterProducts()" />
+        <button (click)="filterProducts()" class="ml-2 px-4 py-2 bg-primary text-white rounded">Search</button>
+      </div>
+
+      <!-- Mobile Price Range -->
+      <div>
+        <h3 class="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
+        <div class="space-y-2">
+          <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[0]"
+            (ngModelChange)="filterProducts()" class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
+          <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[1]"
+            (ngModelChange)="filterProducts()" class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
+          <div class="flex justify-between text-sm text-muted-foreground">
+            <span>\${{ priceRange[0] }}</span>
+            <span>\${{ priceRange[1] }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Categories -->
+      <div>
+        <h3 class="text-lg font-semibold mb-4 text-foreground">Category</h3>
+        <div class="space-y-2">
+          <label *ngFor="let category of categories" class="flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="selectedCategories[category]" (ngModelChange)="filterProducts()"
+              class="rounded border-border text-primary focus:ring-primary" />
+            <span class="text-sm text-foreground">{{ category }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Mobile Materials -->
+      <div>
+        <h3 class="text-lg font-semibold mb-4 text-foreground">Material</h3>
+        <div class="space-y-2">
+          <label *ngFor="let brand of brands" class="flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="selectedBrands[brand]" (ngModelChange)="filterProducts()"
+              class="rounded border-border text-primary focus:ring-primary" />
+            <span class="text-sm text-foreground">{{ brand }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Apply Filters Button -->
+      <div class="pt-6 border-t border-border">
+        <button (click)="toggleFilters()"
+          class="w-full bg-primary text-primary-foreground py-3 px-6 rounded-xl font-semibold text-sm shadow-md hover:shadow-xl transition-all duration-300">
+          Apply Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

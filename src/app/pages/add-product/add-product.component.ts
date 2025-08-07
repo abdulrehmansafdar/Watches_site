@@ -28,6 +28,10 @@ import {
   heroArrowRight
 } from '@ng-icons/heroicons/outline';
 import { ProductService } from '../../services/product.service';
+import { CustomDropdownComponent } from '../../components/custom-dropdown/custom-dropdown.component';
+import { ApiCallService } from '../../services/api-call.service';
+import { ThemeService } from '../../services/theme.service';
+import { LoaderService } from '../../services/loader.service';
 
 interface ProductImage {
   id: string;
@@ -72,7 +76,7 @@ interface ProductFormData {
 @Component({
   selector: 'app-add-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIcon],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgIcon, CustomDropdownComponent],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.scss',
   viewProviders: [provideIcons({
@@ -129,69 +133,47 @@ export class AddProductComponent implements OnInit {
   Badges: any[] = [];
 
   // Predefined features
-  availableFeatures = [
-    'Chronograph',
-    'Date Display',
-    'GMT Function',
-    'Moon Phase',
-    'Perpetual Calendar',
-    'Tourbillon',
-    'Power Reserve Indicator',
-    'Dual Time Zone',
-    'Alarm',
-    'Luminous Hands',
-    'Sapphire Crystal',
-    'Anti-Magnetic',
-    'Shock Resistant',
-    'Screw-down Crown'
-  ];
-
-  // Enhanced dropdown state management
-  dropdownStates: { [key: string]: boolean } = {
-    Category: false,
-    Brand: false,
-    movement: false,
-    material: false,
-    Resistance: false,
-    Badge: false
-  };
-
-  // Search queries for filtering
-  searchQueries: { [key: string]: string } = {
-    Category: '',
-    Brand: '',
-    movement: '',
-    material: '',
-    Resistance: '',
-    Badge: ''
-  };
-
-  // Filtered options
-  filteredOptions: { [key: string]: string[] } = {};
-
+  availableFeatures = [];
   constructor(
     private fb: FormBuilder,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private productService: ProductService
+    private productService: ProductService,
+    private apiService: ApiCallService,
+    private themeService: ThemeService,
+    private loader:LoaderService
   ) {
     this.initializeForm();
-    this.initializeFilteredOptions();
+
   }
 
   ngOnInit() {
     this.loadDraftIfExists();
     // Close dropdowns when clicking outside
-    if (isPlatformBrowser(this.platformId)) {
-      document.addEventListener('click', this.onDocumentClick.bind(this));
-    }
+
+    this.loadFeatures();
   }
 
-  ngOnDestroy() {
-    if (isPlatformBrowser(this.platformId)) {
-      document.removeEventListener('click', this.onDocumentClick.bind(this));
-    }
+  loadFeatures() {
+    this.apiService.GetcallWithToken('Feature/GetFeatures').subscribe({
+      next: (response) => {
+        if (response.responseCode === 200) {
+          this.availableFeatures = response.data.map((item: any) => item.name);
+        }
+        else {
+          // this.themeService.shownotification('Failed to load features: ' + response.errorMessage, 'error');
+          this.availableFeatures = [];
+        }
+      },
+      error: (error) => {
+        // this.themeService.shownotification('Error loading features: ' + error.message, 'error');
+        console.error('Error loading features:', error);
+        this.availableFeatures = [];
+      }
+    });
   }
+
+
 
   initializeForm() {
     this.productForm = this.fb.group({
@@ -222,6 +204,7 @@ export class AddProductComponent implements OnInit {
         caseMaterial: [''],
         dialColor: [''],
         strapMaterial: [''],
+        strapColor: [''],
         crystal: [''],
         powerReserve: [''],
         jewels: [''],
@@ -254,26 +237,22 @@ export class AddProductComponent implements OnInit {
     });
   }
 
-  // Initialize filtered options
-  initializeFilteredOptions() {
-    this.filteredOptions = {
-      Category: [...this.categories],
-      Brand: [...this.Brands],
-      movement: [...this.movements],
-      material: [...this.materials],
-      Resistance: [...this.ResistanceOptions],
-      Badge: [...this.Badges]
-    };
-  }
+
 
   // Step Navigation
   nextStep() {
     if (this.validateCurrentStep()) {
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
+        console.log(`Navigating to step ${this.currentStep}`);
+      }
+      else {
+        // If on the last step, trigger save action
+        this.saveProduct();
       }
     }
   }
+
 
   previousStep() {
     if (this.currentStep > 1) {
@@ -503,42 +482,64 @@ export class AddProductComponent implements OnInit {
     }
 
     this.isSaving = true;
+    this.loader.show(); // Show loader while saving
 
     try {
-      // Simulate image upload
-      for (const image of this.productImages) {
-        image.uploading = true;
-        await this.simulateImageUpload(image);
-        image.uploading = false;
-        image.uploaded = true;
-      }
+      // Prepare the data
+      const formValue = this.productForm.value;
 
-      // Simulate product creation
-      await this.simulateProductCreation();
+      // Convert FormArray to array for tags and features
+      formValue.tags = this.tagsArray.value;
+      formValue.features = this.featuresArray.value;
 
-      this.clearDraft();
-      alert('Product created successfully!');
-      this.router.navigate(['/admin/products']);
+      // Build the JSON string for the watch
+      const watchJson = JSON.stringify(formValue);
+
+      // Build FormData
+      const formData = new FormData();
+      formData.append('watchJson', watchJson);
+
+      // Append images
+      this.productImages.forEach((img, idx) => {
+        if (img.file) {
+          formData.append('images', img.file, img.file.name);
+        }
+      });
+
+      // Call API (use your ApiCallService or HttpClient directly)
+      this.apiService.PostFormDataWithToken('Watch/AddWatch', formData).subscribe({
+        next: (response) => {
+          
+          if(response.responseCode === 200) {
+            this.themeService.shownotification('Product created successfully!', 'success');
+            this.clearDraft(); // Clear draft after successful save
+            // move to first step
+            this.currentStep = 1;
+            this.productImages = []; // Clear images after save
+            this.productForm.reset(); // Reset form
+            this.loader.hide(); // Hide loader after save
+            this.isSaving = false; // Reset saving state
+          }
+          else {
+            this.themeService.shownotification('Failed to create product: ' + response.errorMessage, 'error');
+            this.loader.hide(); // Hide loader on error
+            this.isSaving = false; // Reset saving state
+          }
+          // this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+          this.themeService.shownotification('Error creating product: ' + error.message, 'error');
+          console.error('Error creating product:', error);
+          this.loader.hide(); // Hide loader on error
+          this.isSaving = false; // Reset saving state
+        },
+        
+      });
     } catch (error) {
-      alert('Error creating product. Please try again.');
-    } finally {
+      console.error('Error saving product:', error);
       this.isSaving = false;
+      this.loader.hide(); // Hide loader on error
     }
-  }
-
-  private simulateImageUpload(image: ProductImage): Promise<void> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        image.url = '/assets/products/' + image.file?.name;
-        resolve();
-      }, Math.random() * 2000 + 1000);
-    });
-  }
-
-  private simulateProductCreation(): Promise<void> {
-    return new Promise(resolve => {
-      setTimeout(resolve, 2000);
-    });
   }
 
   // Step Information
@@ -573,85 +574,18 @@ export class AddProductComponent implements OnInit {
   }
 
   // Toggle dropdown visibility
-  toggleDropdown(dropdownName: string) {
-    Object.keys(this.dropdownStates).forEach(key => {
-      if (key !== dropdownName) {
-        this.dropdownStates[key] = false;
-      }
-    });
 
-    this.dropdownStates[dropdownName] = !this.dropdownStates[dropdownName];
-
-    if (this.dropdownStates[dropdownName]) {
-      this.productService.getDropdownData(dropdownName, `Get${dropdownName}s`).subscribe({
-        next: (response) => {
-          if (response.responseCode === 200) {
-            // Set the dropdown data
-            switch (dropdownName) {
-              case 'Brand': this.Brands = response.data; break;
-              case 'Category': this.categories = response.data; break;
-              case 'movement': this.movements = response.data; break;
-              case 'material': this.materials = response.data; break;
-              case 'Resistance': this.ResistanceOptions = response.data; break;
-              case 'Badge': this.Badges = response.data; break;
-            }
-            this.filteredOptions[dropdownName] = response.data.map((item: any) => item.name);
-          }
-        },
-        error: () => {
-          this.filteredOptions[dropdownName] = [];
-        }
-      });
-      this.searchQueries[dropdownName] = '';
-      this.filterOptions(dropdownName);
-    }
-  }
 
   // Close dropdown when clicking outside
-  onDocumentClick(event: Event) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.relative')) {
-      Object.keys(this.dropdownStates).forEach(key => {
-        this.dropdownStates[key] = false;
-      });
-    }
-  }
+
 
   // Filter options based on search query
-  filterOptions(dropdownName: string) {
-    debugger
-    const query = this.searchQueries[dropdownName]?.toLowerCase() || '';
-    const allOptions = this.getAllOptions(dropdownName);
-
-    this.filteredOptions[dropdownName] = allOptions.filter(option =>
-      option.toLowerCase().includes(query)
-    );
-  }
 
   // Get all options for a dropdown
-  getAllOptions(dropdownName: string): string[] {
-    switch (dropdownName) {
-      case 'Category': return this.categories.map(c => c.name);
-      case 'Brand': return this.Brands.map(b => b.name);
-      case 'movement': return this.movements.map(m => m.name);
-      case 'material': return this.materials.map(m => m.name);
-      case 'Resistance': return this.ResistanceOptions.map(w => w.name);
-      case 'Badge': return this.Badges.map(b => b.name);
-      default: return [];
-    }
-  }
+
 
   // Get filtered options for display
-  getFilteredOptions(dropdownName: string): string[] {
-    return this.filteredOptions[dropdownName] || [];
-  }
 
-  // Select an option from dropdown
-  selectOption(dropdownName: string, value: string) {
-    this.productForm.patchValue({ [dropdownName]: value });
-    this.dropdownStates[dropdownName] = false;
-    this.searchQueries[dropdownName] = '';
-  }
 
   // Get material color for visual representation
   getMaterialColor(material: string): string {

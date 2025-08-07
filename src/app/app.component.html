@@ -1,8 +1,53 @@
 <app-loader></app-loader>
-<div class="min-h-screen bg-background text-foreground">
-      <app-header></app-header>
-      <main>
-        <router-outlet></router-outlet>
-      </main>
-      <app-footer></app-footer>
+
+<section *ngIf="!hideTopBanner"
+  class="py-2 bg-gradient-to-r from-primary via-orange-500 to-primary text-white overflow-hidden relative">
+  <div class="relative">
+    <!-- Scrolling container -->
+    <div class="flex animate-scroll space-x-12 whitespace-nowrap">
+      <!-- First set of promotions -->
+      <ng-container *ngFor="let promo of topPromotions">
+        <div class="flex items-center space-x-2 text-xs font-medium uppercase tracking-wide">
+          <ng-icon [name]="promo.icon" class="w-3 h-3"></ng-icon>
+          <span>{{ promo.text }}</span>
+        </div>
+      </ng-container>
+
+      <!-- Duplicate for seamless scrolling -->
+      <ng-container *ngFor="let promo of topPromotions">
+        <div class="flex  items-center space-x-2 text-xs font-medium uppercase tracking-wide">
+          <ng-icon [name]="promo.icon" class="w-3 h-3"></ng-icon>
+          <span>{{ promo.text }}</span>
+        </div>
+      </ng-container>
     </div>
+  </div>
+
+  <!-- Close button (optional) -->
+  <button
+    class="absolute right-4 top-1/2 transform -translate-y-1/2 hover:bg-white/20 rounded-full p-1 transition-colors duration-200"
+    (click)="closeTopBanner()" *ngIf="!hideTopBanner">
+    <ng-icon name="heroXMark" class="w-3 h-3"></ng-icon>
+  </button>
+</section>
+
+<!-- floating icons showing every where -->
+<div class="fixed bottom-1/2 right-4 flex flex-col space-y-2 z-[999]">
+  <a href="https://wa.me/923001234567" target="_blank" class="p-3 bg-green-600 z-[999] text-white rounded-2xl shadow-lg hover:bg-green-800 transition-colors">
+    <ng-icon name="ionLogoWhatsapp" class="w-6 h-6"></ng-icon>
+  </a>
+  <a href="https://t.me/yourchannel" target="_blank" class="p-3 bg-pink-600 z-[999] text-white rounded-2xl shadow-lg hover:bg-pink-800 transition-colors">
+    <ng-icon name="ionLogoInstagram" class="w-6 h-6"></ng-icon>
+  </a>
+  </div>
+
+
+
+<!-- Main app layout -->
+<div class="min-h-screen bg-background text-foreground">
+  <app-header></app-header>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+  <app-footer></app-footer>
+</div>
