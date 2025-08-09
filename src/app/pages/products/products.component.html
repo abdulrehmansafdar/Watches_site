@@ -25,15 +25,15 @@
           <div>
             <h3 class="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
             <div class="space-y-2">
-              <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[0]"
+              <input type="range" min="0" max="1000000" step="1000" [(ngModel)]="priceRange[0]"
                 (ngModelChange)="filterProducts()"
                 class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
-              <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[1]"
+              <input type="range" min="0" max="1000000" step="1000" [(ngModel)]="priceRange[1]"
                 (ngModelChange)="filterProducts()"
                 class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
               <div class="flex justify-between text-sm text-muted-foreground">
-                <span>\${{ priceRange[0] }}</span>
-                <span>\${{ priceRange[1] }}</span>
+                <span>\RS {{ priceRange[0] }}</span>
+                <span>\RS {{ priceRange[1] }}</span>
               </div>
             </div>
           </div>
@@ -180,10 +180,7 @@
                       product.discount | number:'1.0-0' }}%</span>
                   </div>
                 </div>
-                <div *ngIf="product.features?.length" class="mt-2">
-                  <span class="text-xs text-muted-foreground">Features:</span>
-                  <span class="text-xs text-foreground">{{ product.features?.join(', ') }}</span>
-                </div>
+                
               </div>
             </ui-card-content>
           </ui-card>
@@ -276,6 +273,14 @@
                       class="ml-2 text-xs text-white bg-red-500 py-1 px-2 rounded-xl font-semibold">-{{
                       product.discount | number:'1.0-0' }}%</span>
                   </div>
+                  <div *ngIf="product.features?.length" class="mt-2">
+                  <span class="text-xs text-muted-foreground">Features:</span>
+                  <div class="flex flex-wrap gap-2 mt-1">
+                    <span *ngFor="let feature of product.features" class="inline-block bg-muted px-2 py-1 rounded text-xs text-foreground">
+                      {{ feature }}
+                    </span>
+                  </div>
+                </div>
                 </div>
               </ui-card-content>
             </div>
@@ -385,13 +390,13 @@
       <div>
         <h3 class="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
         <div class="space-y-2">
-          <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[0]"
+          <input type="range" min="0" max="1000000" step="1000" [(ngModel)]="priceRange[0]"
             (ngModelChange)="filterProducts()" class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
-          <input type="range" min="0" max="2000" step="50" [(ngModel)]="priceRange[1]"
+          <input type="range" min="0" max="1000000" step="1000" [(ngModel)]="priceRange[1]"
             (ngModelChange)="filterProducts()" class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer" />
           <div class="flex justify-between text-sm text-muted-foreground">
-            <span>\${{ priceRange[0] }}</span>
-            <span>\${{ priceRange[1] }}</span>
+            <span>\RS {{ priceRange[0] }}</span>
+            <span>\RS {{ priceRange[1] }}</span>
           </div>
         </div>
       </div>

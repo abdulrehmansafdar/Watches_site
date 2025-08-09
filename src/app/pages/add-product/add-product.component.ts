@@ -16,6 +16,7 @@ import {
   heroSparkles,
   heroStar,
   heroCurrencyDollar,
+  heroCurrencyRupee,
   heroTag,
   heroWrench,
   heroGlobeAlt,
@@ -92,6 +93,7 @@ interface ProductFormData {
     heroSparkles,
     heroStar,
     heroCurrencyDollar,
+    heroCurrencyRupee,
     heroTag,
     heroWrench,
     heroGlobeAlt,
@@ -179,12 +181,12 @@ export class AddProductComponent implements OnInit {
     this.productForm = this.fb.group({
       // Basic Info
       name: ['', [Validators.required, Validators.minLength(3)]],
-      shortDescription: ['', [Validators.required, Validators.maxLength(150)]],
-      description: ['', [Validators.required, Validators.minLength(20)]],
+      shortDescription: ['', [Validators.required, Validators.maxLength(200)]],
+      description: ['', [Validators.required, Validators.minLength(20),Validators.maxLength(500)]],
 
       // Pricing
       price: [0, [Validators.required, Validators.min(1)]],
-      originalPrice: [0],
+      originalPrice: [0,[Validators.required, Validators.min(1)]],
 
       // Classification
       Category: ['', Validators.required],
@@ -196,7 +198,7 @@ export class AddProductComponent implements OnInit {
       movement: ['', Validators.required],
       material: ['', Validators.required],
       caseDiameter: ['', Validators.required],
-      Resistance: ['', Validators.required],
+      Resistance: [''],
       features: this.fb.array([]),
 
       // Specifications
@@ -205,10 +207,7 @@ export class AddProductComponent implements OnInit {
         dialColor: [''],
         strapMaterial: [''],
         strapColor: [''],
-        crystal: [''],
-        powerReserve: [''],
-        jewels: [''],
-        frequency: ['']
+       
       }),
 
       // Inventory

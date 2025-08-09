@@ -57,7 +57,7 @@ export class ProductsComponent implements OnInit {
   sortBy = 'featured'
   viewMode: 'grid' | 'list' = 'grid'
   showMobileFilters = false
-  priceRange = [0, 2000]
+  priceRange = [0, 1000000]
   totalRecords = 0;
   pageNumber = 1;
   pageSize = 12;
@@ -144,7 +144,7 @@ export class ProductsComponent implements OnInit {
 
   clearFilters() {
     this.searchQuery = '';
-    this.priceRange = [0, 2000];
+    this.priceRange = [0, 1000000];
     this.initializeFilters();
     this.pageNumber = 1;
     this.fetchProducts();
