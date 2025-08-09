@@ -9,7 +9,7 @@ import { CardComponent, CardContentComponent } from "../../components/card/card.
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { heroMinus, heroShare, heroStar } from '@ng-icons/heroicons/outline';
-import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh } from '@ng-icons/ionicons';
+import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh, ionCheckmarkCircle } from '@ng-icons/ionicons';
 import { featherTruck } from "@ng-icons/feather-icons"
 import { ApiCallService } from "../../services/api-call.service"
 
@@ -49,7 +49,7 @@ interface Review {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
-  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar})]
+  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar,ionCheckmarkCircle})]
 })
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null
@@ -113,7 +113,8 @@ export class ProductDetailComponent implements OnInit {
           ...response.data.specifications,
           SKU: response.data.sku,
           Weight: response.data.weight ? `${response.data.weight}g` : '',
-          Warranty: response.data.warranty ? `${response.data.warranty} Years` : '',
+          warrantyYears: response.data.warrantyYears ,
+          warrantyMonths: response.data.warrantyMonths,
         }
       };
     } else {
