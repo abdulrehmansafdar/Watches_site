@@ -5,16 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { CartItem, CartService } from '../../services/cart.service';
 import { CardComponent, CardContentComponent, CardHeaderComponent } from '../../components/card/card.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {ionArrowBack,ionBag,ionAdd,ionShieldOutline} from '@ng-icons/ionicons';
+import {ionArrowBack,ionBag,ionAdd,ionShieldOutline, ionTrashBin} from '@ng-icons/ionicons';
 import { heroMinus,heroXMark } from '@ng-icons/heroicons/outline';
-import { featherTruck } from '@ng-icons/feather-icons';
+import { featherMinusCircle, featherPlusCircle, featherTrash, featherTrash2, featherTruck } from '@ng-icons/feather-icons';
 
 @Component({
   selector: 'app-cart',
   imports: [CommonModule, RouterModule, FormsModule,CardComponent,CardContentComponent,NgIcon],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss',
-  viewProviders: [provideIcons({ ionArrowBack, ionBag, heroMinus, ionAdd, heroXMark, ionShieldOutline, featherTruck })]
+  viewProviders: [provideIcons({ ionArrowBack,featherTrash,ionTrashBin,featherTrash2,featherPlusCircle, ionBag,featherMinusCircle, heroMinus, ionAdd, heroXMark, ionShieldOutline, featherTruck })]
 })
 export class CartComponent implements OnInit {
   cartItems: CartItem[] = []
@@ -47,7 +47,7 @@ export class CartComponent implements OnInit {
   }
 
   get tax(): number {
-    return this.subtotal * 0.08
+    return this.subtotal * 0
   }
 
   get total(): number {

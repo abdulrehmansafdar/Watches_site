@@ -60,7 +60,7 @@ export class ProductsComponent implements OnInit {
   priceRange = [0, 1000000]
   totalRecords = 0;
   pageNumber = 1;
-  pageSize = 12;
+  pageSize = 16;
 
   categories = []
   brands = []

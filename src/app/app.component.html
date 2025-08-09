@@ -1,6 +1,6 @@
 <app-loader></app-loader>
 
-<section *ngIf="!hideTopBanner"
+<section *ngIf="!hideTopBanner && !router.url.includes('admin-dashboard')"
   class="py-2 bg-gradient-to-r from-primary via-orange-500 to-primary text-white overflow-hidden relative">
   <div class="relative">
     <!-- Scrolling container -->

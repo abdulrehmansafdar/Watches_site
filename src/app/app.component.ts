@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterOutlet } from "@angular/router"
+import { Router, RouterOutlet } from "@angular/router"
 
 import { FooterComponent } from "./components/footer/footer.component"
 import { HeaderComponent } from "./components/header/header.component";
@@ -62,7 +62,8 @@ export class AppComponent implements OnInit {
   }
   
   constructor(
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    public router:Router
   ) { 
     this.loaderService.show(); // Show loader on app initialization
     setTimeout(() => {
