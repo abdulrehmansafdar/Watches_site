@@ -2,6 +2,7 @@ import type { Routes } from "@angular/router"
 import { ContactComponent } from "./pages/contact/contact.component"
 import { AddProductComponent } from "./pages/add-product/add-product.component"
 import { authGuard } from "./guards/auth.guard"
+import { AdminDashboardComponent } from "./pages/admin-dashboard/admin-dashboard.component"
 
 export const routes: Routes = [
   {
@@ -42,11 +43,12 @@ export const routes: Routes = [
     path: "check-out",
     loadComponent: () => import("./pages/checkout/checkout.component").then((m) => m.CheckoutComponent),
   },
+  
   {
-    path: "add-product",
-    component: AddProductComponent,
-    canActivate:[authGuard]
-  },
+  path: "admin-dashboard",
+  loadChildren: () =>
+    import("./pages/admin-dashboard/dashboard.routes").then(m => m.adminRoutes)
+},
   {
     path: "**",
     redirectTo: "",

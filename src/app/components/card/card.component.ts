@@ -42,7 +42,7 @@ export class CardTitleComponent {}
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="p-6 pt-0">
+    <div class="px-6 ">
       <ng-content></ng-content>
     </div>
   `,

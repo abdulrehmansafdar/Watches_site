@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,8 +16,15 @@ import {
   heroEye,
   heroChevronLeft,
   heroChevronRight,
+  heroShieldCheck,
+  heroSparkles,
+  heroCurrencyDollar,
+  heroTruck,
+  heroGift,
+  heroPhone,
 } from '@ng-icons/heroicons/outline';
 import { ionBag, ionStar } from '@ng-icons/ionicons';
+import { ApiCallService } from '../../services/api-call.service';
 
 interface Product {
   id: number;
@@ -36,6 +43,17 @@ interface Collection {
   image: string;
   description: string;
   count?: number;
+}
+interface WatchBrand {
+  id: number;
+  name: string;
+  logo: string;
+  description?: string;
+}
+interface ScrollingOffer {
+  text: string;
+  icon: string;
+  iconColor: string;
 }
 
 @Component({
@@ -60,185 +78,124 @@ interface Collection {
       ionStar,
       heroChevronLeft,
       heroChevronRight,
+      heroShieldCheck,
+      heroSparkles,
+      heroCurrencyDollar,
+      heroTruck,
+      heroGift,
+      heroPhone,
     }),
   ],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   email = '';
   Math = Math;
-
-  // Organize products by categories
-  productCategories = [
+  categoryWatches: any[] = [];
+  ngOnInit() {
+    this.apicall.GetcallWithoutToken('Watch/GetWatchesByCategory').subscribe({
+      next: (res) => (this.categoryWatches = res),
+      error: () => (this.categoryWatches = []),
+    });
+  }
+  scrollingOffers: ScrollingOffer[] = [
     {
-      name: 'Luxury Collection',
-      id: 'luxury',
-      products: [
-        {
-          id: 1,
-          name: 'Chronos Elite',
-          price: 899,
-          originalPrice: 1299,
-          image: '/assets/d-1.webp',
-          rating: 4.8,
-          reviews: 124,
-          badge: 'Best Seller',
-          category: 'Luxury',
-        },
-        {
-          id: 2,
-          name: 'Heritage Gold',
-          price: 1299,
-          originalPrice: 1499,
-          image: '/assets/d-2.webp',
-          rating: 4.7,
-          reviews: 89,
-          badge: 'Limited Edition',
-          category: 'Luxury',
-        },
-        {
-          id: 3,
-          name: 'Shadow Black',
-          price: 799,
-          originalPrice: 999,
-          image: '/assets/d-3.webp',
-          rating: 4.5,
-          reviews: 76,
-          badge: 'Trending',
-          category: 'Classic',
-        },
-        {
-          id: 4,
-          name: 'Astra Steel',
-          price: 1099,
-          originalPrice: 1399,
-          image: '/assets/d-4.webp',
-          rating: 4.6,
-          reviews: 52,
-          badge: 'Hot Deal',
-          category: 'Modern',
-        },
-        {
-          id: 5,
-          name: 'Oceanic Blue',
-          price: 950,
-          originalPrice: 1150,
-          image: '/assets/d-5.webp',
-          rating: 4.4,
-          reviews: 64,
-          badge: 'Top Pick',
-          category: 'Sport',
-        },
-        {
-          id: 6,
-          name: 'Lunar Chrome',
-          price: 1199,
-          originalPrice: 1399,
-          image: '/assets/d-6.webp',
-          rating: 4.9,
-          reviews: 101,
-          badge: 'Premium',
-          category: 'Luxury',
-        },
-        {
-          id: 7,
-          name: 'Midnight Racer',
-          price: 849,
-          originalPrice: 999,
-          image: '/assets/d-7.webp',
-          rating: 4.6,
-          reviews: 58,
-          badge: 'Best Value',
-          category: 'Sport',
-        },
-        {
-          id: 8,
-          name: 'Rose Gold Charm',
-          price: 999,
-          originalPrice: 1199,
-          image: '/assets/d-8.webp',
-          rating: 4.7,
-          reviews: 72,
-          badge: "Editor's Choice",
-          category: 'Luxury',
-        },
-        {
-          id: 9,
-          name: 'Desert Bronze',
-          price: 975,
-          originalPrice: 1125,
-          image: '/assets/d-9.webp',
-          rating: 4.5,
-          reviews: 48,
-          badge: 'New Arrival',
-          category: 'Classic',
-        },
-        {
-          id: 10,
-          name: 'Skyline Titanium',
-          price: 1399,
-          originalPrice: 1599,
-          image: '/assets/d-10.webp',
-          rating: 4.8,
-          reviews: 83,
-          badge: 'Luxury Pick',
-          category: 'Modern',
-        },
-      ],
+      text: 'Free Worldwide Shipping on Orders Over $500',
+      icon: 'heroTruck',
+      iconColor: 'text-blue-400',
     },
     {
-      name: 'Minimalist Collection',
-      id: 'minimalist',
-      products: [
-        {
-          id: 2,
-          name: 'Minimal Classic',
-          price: 299,
-          image: '/assets/d-2.webp',
-          rating: 4.6,
-          reviews: 89,
-          badge: 'New',
-          category: 'Minimalist',
-          originalPrice: 399,
-        },
-      ],
+      text: '2-Year International Warranty',
+      icon: 'heroShieldCheck',
+      iconColor: 'text-green-400',
     },
     {
-      name: 'Sport Collection',
-      id: 'sport',
-      products: [
-        {
-          id: 3,
-          name: 'Sport Pro',
-          price: 599,
-          image: '/assets/d-3.webp',
-          rating: 4.9,
-          reviews: 156,
-          badge: 'Popular',
-          category: 'Sport',
-          originalPrice: 699,
-        },
-      ],
+      text: 'Premium Quality Guaranteed',
+      icon: 'heroSparkles',
+      iconColor: 'text-yellow-400',
+    },
+    {
+      text: 'Best Price Promise',
+      icon: 'heroCurrencyDollar',
+      iconColor: 'text-emerald-400',
+    },
+    {
+      text: 'Exclusive Member Discounts Up to 20%',
+      icon: 'heroGift',
+      iconColor: 'text-pink-400',
+    },
+    {
+      text: '24/7 Customer Support',
+      icon: 'heroPhone',
+      iconColor: 'text-purple-400',
+    },
+    {
+      text: '30-Day Money Back Guarantee',
+      icon: 'heroShieldCheck',
+      iconColor: 'text-green-400',
+    },
+    {
+      text: 'Authentic Timepieces Only',
+      icon: 'heroSparkles',
+      iconColor: 'text-orange-400',
+    },
+  ];
+  watchBrands: WatchBrand[] = [
+    {
+      id: 1,
+      name: 'Rolex',
+      logo: '/assets/brands/rolex-logo.png',
+      description: 'A crown for every achievement',
+    },
+    {
+      id: 2,
+      name: 'Patek Philippe',
+      logo: '/assets/brands/patek-philippe-logo.webp',
+      description: 'You never actually own a Patek Philippe',
+    },
+    {
+      id: 3,
+      name: 'Tissot',
+      logo: '/assets/brands/tissot-logo.webp',
+      description: 'Innovators by tradition',
+    },
+    {
+      id: 4,
+      name: 'Tag Heuer',
+      logo: '/assets/brands/tag-heuer-logo.webp',
+      description: "Don't crack under pressure",
+    },
+    {
+      id: 5,
+      name: 'Audemars Piguet',
+      logo: '/assets/brands/audemars-piguet-ap.webp',
+      description: 'To break the rules, you must first master them',
+    },
+    {
+      id: 6,
+      name: 'Omega',
+      logo: '/assets/brands/omega-logo.webp',
+      description: 'The mark of excellence',
     },
   ];
 
   collections: Collection[] = [
     {
-      name: 'Classic Heritage',
-      image: '/assets/collection-1.jpg',
+      name: 'Luxury Heritage',
+      image: '/assets/luxury.webp',
       count: 5,
       description:
         'Timeless elegance meets traditional craftsmanship in our heritage collection.',
     },
     {
       name: 'Modern Sport',
-      image: '/assets/collection-2.jpg',
+      image: '/assets/sports.webp',
       count: 3,
       description:
         'Built for performance, designed for style. Perfect for the active lifestyle.',
     },
     {
-      name: 'Luxury Elite',
-      image: '/assets/collection-3.jpg',
+      name: 'Minimalist Chic',
+      image: '/assets/mini.webp',
       count: 4,
       description:
         'The pinnacle of horological excellence, featuring premium materials and complications.',
@@ -247,9 +204,12 @@ export class HomeComponent {
 
   currentSlides: { [key: string]: number } = {};
 
-  constructor(private cartService: CartService) {
+  constructor(
+    private cartService: CartService,
+    private apicall: ApiCallService
+  ) {
     // Initialize current slides for each category
-    this.productCategories.forEach((category) => {
+    this.categoryWatches.forEach((category) => {
       this.currentSlides[category.id] = 0;
     });
   }
@@ -274,7 +234,7 @@ export class HomeComponent {
 
   // Carousel navigation methods
   nextSlide(categoryId: string) {
-    const category = this.productCategories.find((c) => c.id === categoryId);
+    const category = this.categoryWatches.find((c) => c.id === categoryId);
     if (category) {
       const maxSlide = Math.max(0, category.products.length - 4); // Show 4 cards at once
       this.currentSlides[categoryId] = Math.min(
@@ -306,4 +266,50 @@ export class HomeComponent {
       category: product.category,
     });
   }
+  // Split your offers into two arrays for multi-row effect
+  primaryOffers: ScrollingOffer[] = [
+    {
+      text: 'Free Worldwide Shipping on Orders Over $500',
+      icon: 'heroTruck',
+      iconColor: 'text-blue-400',
+    },
+    {
+      text: '2-Year International Warranty',
+      icon: 'heroShieldCheck',
+      iconColor: 'text-green-400',
+    },
+    {
+      text: 'Premium Quality Guaranteed',
+      icon: 'heroSparkles',
+      iconColor: 'text-yellow-400',
+    },
+    {
+      text: 'Best Price Promise',
+      icon: 'heroCurrencyDollar',
+      iconColor: 'text-emerald-400',
+    },
+  ];
+
+  secondaryOffers: ScrollingOffer[] = [
+    {
+      text: 'Exclusive Member Discounts Up to 20%',
+      icon: 'heroGift',
+      iconColor: 'text-pink-400',
+    },
+    {
+      text: '24/7 Customer Support',
+      icon: 'heroPhone',
+      iconColor: 'text-purple-400',
+    },
+    {
+      text: '30-Day Money Back Guarantee',
+      icon: 'heroShieldCheck',
+      iconColor: 'text-green-400',
+    },
+    {
+      text: 'Authentic Timepieces Only',
+      icon: 'heroSparkles',
+      iconColor: 'text-orange-400',
+    },
+  ];
 }

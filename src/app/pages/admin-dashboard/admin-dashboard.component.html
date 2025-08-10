@@ -1,1 +1,13 @@
-<p>admin-dashboard works!</p>
+<div class="min-h-screen w-[100%] bg-gray-50 dark:bg-gray-900">
+  <!-- Sidebar -->
+<div class="w-[5%] fixed">
+      <app-admin-sidebar></app-admin-sidebar>
+</div>
+  
+  <div class=" w-[100%] overflow-hidden">
+    <!-- Main Content -->
+  <div class="">
+    <router-outlet></router-outlet>
+  </div>
+  </div>
+</div>

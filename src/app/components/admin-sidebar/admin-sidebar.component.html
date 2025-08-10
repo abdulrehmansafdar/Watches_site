@@ -1,0 +1,105 @@
+<div [class]="'h-[91dvh] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-[999] shadow-lg transition-all duration-300 flex flex-col ' + (isCollapsed ? 'w-16' : 'w-64')">
+  <!-- Header -->
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div [class]="'flex items-center space-x-3 ' + (isCollapsed ? 'justify-center' : '')">
+        <div *ngIf="!isCollapsed"  class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-sm">W</span>
+        </div>
+        <div *ngIf="!isCollapsed">
+          <h1 class="text-lg font-bold text-gray-900 dark:text-white">Watch Admin</h1>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Management Panel</p>
+        </div>
+      </div>
+      <button (click)="toggleSidebar()" 
+        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+        <ng-icon [name]="isCollapsed ? 'heroChevronRight' : 'heroChevronDown'" 
+          class="w-4 h-4 text-gray-600 dark:text-gray-400"></ng-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul class="space-y-1 px-3">
+      <li *ngFor="let item of menuItems">
+        <!-- Main Menu Item -->
+        <div>
+          <!-- Item without children -->
+          <a *ngIf="!item.children" 
+            [routerLink]="item.route"
+            routerLinkActive="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-2 border-blue-500"
+            [class]="'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 group ' + (isCollapsed ? 'justify-center' : 'justify-between')">
+            <div class="flex items-center space-x-3">
+              <ng-icon [name]="item.icon" class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></ng-icon>
+              <span *ngIf="!isCollapsed" class="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
+                {{ item.title }}
+              </span>
+            </div>
+            <span *ngIf="item.badge && !isCollapsed" 
+              class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+              {{ item.badge }}
+            </span>
+          </a>
+
+          <!-- Item with children -->
+          <button *ngIf="item.children" 
+            (click)="toggleMenuItem(item)"
+            [class]="'w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 group ' + 
+                    (isParentActive(item) ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300') +
+                    (isCollapsed ? ' justify-center' : ' justify-between')">
+            <div class="flex items-center space-x-3">
+              <ng-icon [name]="item.icon" class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></ng-icon>
+              <span *ngIf="!isCollapsed" class="group-hover:text-gray-900 dark:group-hover:text-white">
+                {{ item.title }}
+              </span>
+            </div>
+            <div *ngIf="!isCollapsed" class="flex items-center space-x-2">
+              <span *ngIf="item.badge" 
+                class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                {{ item.badge }}
+              </span>
+              <ng-icon [name]="item.isExpanded ? 'heroChevronDown' : 'heroChevronRight'" 
+                class="w-4 h-4 text-gray-400 transition-transform duration-200"></ng-icon>
+            </div>
+          </button>
+
+          <!-- Submenu -->
+          <div *ngIf="item.children && item.isExpanded && !isCollapsed" 
+            class="mt-1 ml-6 space-y-1 border-l border-gray-200 dark:border-gray-700 pl-4">
+            <a *ngFor="let child of item.children" 
+              [routerLink]="child.route"
+              routerLinkActive="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-2 border-blue-500"
+              class="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 group">
+              <div class="flex items-center space-x-3">
+                <ng-icon [name]="child.icon" class="w-4 h-4"></ng-icon>
+                <span>{{ child.title }}</span>
+              </div>
+              <span *ngIf="child.badge" 
+                class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                {{ child.badge }}
+              </span>
+            </a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer -->
+  <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+    
+
+    <!-- Logout Button -->
+    <button (click)="logout()" 
+      [class]="'w-full flex items-center  text-sm font-medium text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 group ' + (isCollapsed ? 'justify-center ' : 'justify-start space-x-3 px-3 py-2.5')">
+      <ng-icon name="heroArrowLeftOnRectangle" class="w-5 h-5"></ng-icon>
+      <span *ngIf="!isCollapsed">Logout</span>
+    </button>
+  </div>
+
+  <!-- Collapsed Mode Tooltip -->
+  <div *ngIf="isCollapsed" class="absolute left-16 top-20 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+    Admin Panel
+  </div>
+</div>

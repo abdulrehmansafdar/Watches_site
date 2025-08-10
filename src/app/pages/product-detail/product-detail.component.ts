@@ -9,8 +9,9 @@ import { CardComponent, CardContentComponent } from "../../components/card/card.
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { heroMinus, heroShare, heroStar } from '@ng-icons/heroicons/outline';
-import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh } from '@ng-icons/ionicons';
+import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh, ionCheckmarkCircle } from '@ng-icons/ionicons';
 import { featherTruck } from "@ng-icons/feather-icons"
+import { ApiCallService } from "../../services/api-call.service"
 
 interface Product {
   id: number
@@ -48,7 +49,7 @@ interface Review {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
-  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar})]
+  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar,ionCheckmarkCircle})]
 })
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null
@@ -70,53 +71,14 @@ export class ProductDetailComponent implements OnInit {
  
  
 
-  // Mock product data
-  mockProduct: Product = {
-    id: 1,
-    name: "Chronos Elite",
-    price: 899,
-    originalPrice: 1299,
-    images: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-    rating: 4.8,
-    reviews: 124,
-    badge: "Best Seller",
-    category: "Luxury",
-    brand: "Chronos",
-    movement: "Automatic",
-    material: "Stainless Steel",
-    waterResistance: "100m",
-    caseDiameter: "42mm",
-    description:
-      "The Chronos Elite represents the pinnacle of horological excellence. Crafted with precision and attention to detail, this timepiece features a Swiss automatic movement housed in a premium stainless steel case. The elegant design makes it perfect for both formal occasions and everyday wear.",
-    features: [
-      "Swiss automatic movement",
-      "Sapphire crystal glass",
-      "Stainless steel case and bracelet",
-      "Water resistant to 100 meters",
-      "Date display at 3 o'clock",
-      "Luminous hands and markers",
-    ],
-    specifications: {
-      "Case Material": "Stainless Steel",
-      "Case Diameter": "42mm",
-      "Case Thickness": "12mm",
-      Movement: "Swiss Automatic",
-      "Power Reserve": "42 hours",
-      "Water Resistance": "100m",
-      Crystal: "Sapphire",
-      Strap: "Stainless Steel Bracelet",
-    },
-  }
+  
+  
 
   constructor(
     private route: ActivatedRoute,
     private cartService: CartService,
     private reviewService: ReviewService,
+    private apiService:ApiCallService
   ) {}
 
   ngOnInit() {
@@ -128,9 +90,44 @@ export class ProductDetailComponent implements OnInit {
   }
 
   loadProduct(id: number) {
-    // In a real app, this would fetch from an API
-    this.product = { ...this.mockProduct, id }
+     this.apiService.GetcallWithoutToken(`Watch/GetWatchDetails?watchId=${id}`).subscribe((response: any) => {
+      if(response.responseCode === 200) {
+      this.product = {
+        id: response.data.id,
+        name: response.data.name,
+        price: response.data.price,
+        originalPrice: response.data.originalPrice,
+        images: response.data.images,
+        rating: response.data.rating,
+        reviews: response.data.reviewsCount,
+        badge: response.data.badge,
+        category: response.data.category,
+        brand: response.data.brand,
+        movement: response.data.movement,
+        material: response.data.material,
+        waterResistance: response.data.waterResistance,
+        caseDiameter: response.data.dimensions ? `${response.data.dimensions.width}mm` : '',
+        description: response.data.description,
+        features: response.data.features,
+        specifications: {
+          ...response.data.specifications,
+          SKU: response.data.sku,
+          Weight: response.data.weight ? `${response.data.weight}g` : '',
+          warrantyYears: response.data.warrantyYears ,
+          warrantyMonths: response.data.warrantyMonths,
+        }
+      };
+    } else {
+      console.error("Failed to load product details", response.message);
+      this.product = null;
+    }
+    }, (error: any) => {
+      console.error("Error loading product details", error);
+      this.product = null;
+
+    });
   }
+  
 
   loadReviews(productId: number) {
     this.reviewService.getReviews(productId).subscribe((reviews) => {

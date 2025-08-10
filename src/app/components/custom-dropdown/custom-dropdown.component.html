@@ -1,0 +1,56 @@
+<div>
+  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+    {{ label }} <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+  <div class="relative">
+    <button type="button" (click)="toggleDropdown()"
+      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 flex items-center justify-between">
+      <span [class]="selected ? 'text-gray-900 dark:text-white' : 'text-gray-500'">
+        {{ selected || placeholder }}
+      </span>
+      <ng-icon *ngIf="showIcon" [name]="icon || 'heroChevronDown'" class="w-5 h-5 text-gray-400 transition-transform duration-200"
+        [class.rotate-180]="dropdownOpen"></ng-icon>
+    </button>
+
+    <div *ngIf="dropdownOpen"
+      class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-2xl max-h-64 overflow-hidden">
+
+      <!-- Search Input -->
+      <div *ngIf="searchEnabled" class="p-3 border-b border-gray-200 dark:border-gray-600">
+        <div class="relative">
+          <ng-icon name="heroMagnifyingGlass"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
+          <input type="text" placeholder="Search..." [(ngModel)]="searchQuery"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-sm" />
+        </div>
+      </div>
+
+      <!-- Options List -->
+      <div class="max-h-48 overflow-y-auto">
+        <button type="button" *ngFor="let option of filteredOptions"
+          (click)="selectOption(option)"
+          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-between group">
+          <div class="flex items-center">
+            <!-- Material color circle -->
+            <div *ngIf="getOptionColor" class="w-4 h-4 rounded-full mr-3" [class]="getOptionColor(option)"></div>
+            <span class="text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200">
+              {{ option }}
+            </span>
+            <!-- Resistance description -->
+            <span *ngIf="getOptionDescription" class="ml-2 text-xs text-gray-500 dark:text-gray-400">
+              {{ getOptionDescription(option) }}
+            </span>
+          </div>
+          <ng-icon *ngIf="selected === option" name="heroCheck" class="w-4 h-4 text-primary"></ng-icon>
+        </button>
+
+        <!-- No Results -->
+        <div *ngIf="filteredOptions.length === 0"
+          class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+          <ng-icon name="heroMagnifyingGlass" class="w-8 h-8 mx-auto mb-2 opacity-50"></ng-icon>
+          <p class="text-sm">{{ noResultsText }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
