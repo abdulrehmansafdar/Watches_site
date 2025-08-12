@@ -113,6 +113,7 @@ export class AddProductComponent implements OnInit {
   isLoading = false;
   isSaving = false;
   showPreview = false;
+  stepAttempted = false;
 
   // Image handling
   productImages: ProductImage[] = [];
@@ -143,7 +144,7 @@ export class AddProductComponent implements OnInit {
     private productService: ProductService,
     private apiService: ApiCallService,
     private themeService: ThemeService,
-    private loader:LoaderService
+    private loader: LoaderService
   ) {
     this.initializeForm();
 
@@ -182,11 +183,11 @@ export class AddProductComponent implements OnInit {
       // Basic Info
       name: ['', [Validators.required, Validators.minLength(3)]],
       shortDescription: ['', [Validators.required, Validators.maxLength(200)]],
-      description: ['', [Validators.required, Validators.minLength(20),Validators.maxLength(500)]],
+      description: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
 
       // Pricing
       price: [0, [Validators.required, Validators.min(1)]],
-      originalPrice: [0,[Validators.required, Validators.min(1)]],
+      originalPrice: [''],
 
       // Classification
       Category: ['', Validators.required],
@@ -207,7 +208,7 @@ export class AddProductComponent implements OnInit {
         dialColor: [''],
         strapMaterial: [''],
         strapColor: [''],
-       
+
       }),
 
       // Inventory
@@ -239,6 +240,14 @@ export class AddProductComponent implements OnInit {
 
 
   // Step Navigation
+  onNextStep() {
+    debugger
+    this.stepAttempted = true;
+    if (this.validateCurrentStep()) {
+      this.stepAttempted = false;
+      this.nextStep();
+    }
+  }
   nextStep() {
     if (this.validateCurrentStep()) {
       if (this.currentStep < this.totalSteps) {
@@ -508,8 +517,8 @@ export class AddProductComponent implements OnInit {
       // Call API (use your ApiCallService or HttpClient directly)
       this.apiService.PostFormDataWithToken('Watch/AddWatch', formData).subscribe({
         next: (response) => {
-          
-          if(response.responseCode === 200) {
+
+          if (response.responseCode === 200) {
             this.themeService.shownotification('Product created successfully!', 'success');
             this.clearDraft(); // Clear draft after successful save
             // move to first step
@@ -532,7 +541,7 @@ export class AddProductComponent implements OnInit {
           this.loader.hide(); // Hide loader on error
           this.isSaving = false; // Reset saving state
         },
-        
+
       });
     } catch (error) {
       console.error('Error saving product:', error);

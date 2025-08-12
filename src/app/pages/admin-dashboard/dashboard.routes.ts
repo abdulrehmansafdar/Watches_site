@@ -9,13 +9,23 @@ export const adminRoutes: Routes = [
     path: "",
     component: AdminDashboardComponent,
     canActivate: [authGuard],
-     children: [
+    children: [
       { path: "", component: DashboardComponent }, // Default admin dashboard
       {
-    path: "add-product",
-    component: AddProductComponent,
-    canActivate:[authGuard]
-  },
-     ]
+        path: "add-product",
+        component: AddProductComponent,
+        
+      },
+      {
+        path: "admin-management",
+        loadComponent: () => import("./admin-management/admin-management.component").then(m => m.AdminManagementComponent),
+        
+      },
+      {
+        path: "featured-products",
+        loadComponent: () => import("./featured-products/featured-products.component").then(m => m.FeaturedProductsComponent),
+        
+      }
+    ]
   }
 ];

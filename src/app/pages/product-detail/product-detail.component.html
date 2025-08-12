@@ -35,7 +35,7 @@
             {{ product.brand }} • {{ product.category }}
           </p>
 
-            <div class="flex items-center space-x-4 mb-6">
+          <div class="flex items-center space-x-4 mb-6">
             <span class="text-3xl font-bold text-foreground">
               {{ product.price | currency:'PKR':'symbol':'1.0-0':'en-PK' }}
             </span>
@@ -46,7 +46,7 @@
               class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80">
               Save {{ (product.originalPrice - product.price) | currency:'PKR':'symbol':'1.0-0':'en-PK' }}
             </div>
-            </div>
+          </div>
         </div>
 
         <p class="text-muted-foreground leading-relaxed">{{ product.description }}</p>
@@ -68,7 +68,8 @@
           <div>
             <span class="text-sm text-muted-foreground">Water Resistance</span>
             <p class="font-medium">
-              {{ product.waterResistance !== null && product.waterResistance !== undefined && product.waterResistance !== '' ? product.waterResistance : 'No Resistance' }}
+              {{ product.waterResistance !== null && product.waterResistance !== undefined && product.waterResistance
+              !== '' ? product.waterResistance : 'No Resistance' }}
             </p>
           </div>
         </div>
@@ -80,7 +81,7 @@
             <div class="flex items-center border border-border rounded-md">
               <button (click)="decreaseQuantity()" [disabled]="quantity <= 1"
                 class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
-                <ng-icon name="ionBag" class="w-4 h-4"></ng-icon>
+                <ng-icon name="heroMinus" class="w-4 h-4"></ng-icon>
               </button>
               <span class="px-4 py-2 text-center min-w-[3rem]">{{ quantity }}</span>
               <button (click)="increaseQuantity()"
@@ -100,7 +101,7 @@
               [class]="'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ' + (isWishlisted ? 'text-red-600 border-red-600' : '')">
               <ng-icon name="ionHeart" [class]="'w-5 h-5 ' + (isWishlisted ? 'fill-current' : '')"></ng-icon>
             </button>
-            <button
+            <button (click)="copyUrl()"
               class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
               <ng-icon name="heroShare" class="w-5 h-5"></ng-icon>
             </button>
@@ -108,31 +109,42 @@
         </div>
 
         <!-- Trust Badges -->
-        <div class="grid grid-cols-3 gap-4 pt-6 border-t border-border">
+        <div class="grid md:grid-cols-3 grid-cols-1 items-center justify-items-center content-center gap-4 pt-6 border-t border-border">
           <div class="text-center">
             <ng-icon name="ionShieldOutline" class="w-8 h-8 mx-auto mb-2 text-green-600"></ng-icon>
-             
+
             <p class="text-sm font-medium">
-               <span
-                class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-semibold border border-green-200">
-                <ng-icon name="ionCheckmarkCircle" class="w-4 h-4 mr-1 text-green-500"></ng-icon>
-                {{ product.specifications['warrantyYears'] }} Year
-                <span *ngIf="+product.specifications['warrantyYears'] != 1">s</span>
-                <span *ngIf="+product.specifications['warrantyMonths'] > 0">
-                  &nbsp;and&nbsp;{{ product.specifications['warrantyMonths'] }} Month
-                  <span *ngIf="+product.specifications['warrantyMonths'] != 1">s</span>
+              <span
+                class="inline-flex items-center px-2 py-1 rounded-full bg-green-50 text-green-700 font-semibold border border-green-200 whitespace-nowrap gap-2">
+                <ng-icon name="ionCheckmarkCircle" class="w-4 h-4 text-green-500"></ng-icon>
+                <span *ngIf="+product.specifications['warrantyYears'] > 0">
+                  {{ product.specifications['warrantyYears'] }} Year<span
+                    *ngIf="+product.specifications['warrantyYears'] != 1">s</span>
                 </span>
-                &nbsp;Warranty
+                <span *ngIf="+product.specifications['warrantyMonths'] > 0">
+                  {{ product.specifications['warrantyMonths'] }} Month<span
+                    *ngIf="+product.specifications['warrantyMonths'] != 1">s</span>
+                </span>
+                Warranty
               </span>
             </p>
           </div>
           <div class="text-center">
             <ng-icon name="featherTruck" class="w-8 h-8 mx-auto mb-2 text-blue-600"></ng-icon>
-            <p class="text-sm font-medium">Free Shipping</p>
+            <p class="text-sm font-medium">
+              <span
+                class="bg-blue-50 text-blue-600 inline-flex items-center px-2 py-1 rounded-full border-blue-200 whitespace-nowrap border ">
+                Free Shipping</span>
+            </p>
           </div>
           <div class="text-center">
             <ng-icon name="ionRefresh" class="w-8 h-8 mx-auto mb-2 text-purple-600"></ng-icon>
-            <p class="text-sm font-medium">30-Day Returns</p>
+            <p class="text-sm font-medium">
+              <span
+                class="bg-purple-50 text-purple-600 inline-flex items-center px-2 py-1 rounded-full border-purple-200 whitespace-nowrap border ">
+                30-Day Returns
+              </span>
+            </p>
           </div>
         </div>
       </div>
@@ -174,10 +186,11 @@
           <ui-card>
             <ui-card-content class="p-6">
               <h3 class="text-xl font-semibold mb-4">Technical Specifications</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 md:grid-cols-2  gap-x-24">
                 <div *ngFor="let spec of getSpecifications()" class="flex justify-between py-2 border-b border-border">
                   <span class="font-medium text-muted-foreground">{{ spec.key }}:</span>
-                  <span class="text-foreground">{{ spec.value }}</span>
+                  <span class="text-foreground">{{ spec.value !== null && spec.value !== undefined && spec.value !== ''
+                    ? spec.value : 'N/A' }}</span>
                 </div>
               </div>
             </ui-card-content>
@@ -218,12 +231,20 @@
                         </button>
                       </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <div>
-                      <label class="block text-sm font-medium mb-2">Your Name</label>
-                      <input type="text" [(ngModel)]="newReview.userName" name="userName" required
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      <div>
+                        <label class="block text-sm font-medium mb-2">Your Name</label>
+                        <input type="text" [(ngModel)]="newReview.userName" name="userName" required
+                          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium mb-2">Order No</label>
+                        <input type="text" [(ngModel)]="newReview.orderId" name="orderId" required
+                          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
                     </div>
+
 
                     <div>
                       <label class="block text-sm font-medium mb-2">Your Review</label>
@@ -247,10 +268,7 @@
                   <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                       <span class="font-medium">{{ review.userName }}</span>
-                      <div *ngIf="review.verified"
-                        class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-green-100 text-green-800">
-                        Verified Purchase
-                      </div>
+
                       <div class="flex items-center">
                         <ng-icon *ngFor="let star of getStars(review.rating)" name="ionStar"
                           class="w-4 h-4 text-yellow-400 fill-current"></ng-icon>

@@ -1,11 +1,11 @@
 import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule } from "@angular/router"
+import { ActivatedRoute, RouterModule } from "@angular/router"
 import { FormsModule } from "@angular/forms"
 
 import { CardComponent, CardContentComponent } from "../../components/card/card.component"
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroMagnifyingGlass, heroEye, heroShoppingBag, heroXMark, heroChevronLeft, heroChevronRight } from '@ng-icons/heroicons/outline';
+import { heroMagnifyingGlass, heroEye, heroShoppingBag, heroXMark, heroChevronLeft, heroChevronRight, heroDocumentText } from '@ng-icons/heroicons/outline';
 import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart } from "@ng-icons/ionicons"
 import { ApiCallService } from "../../services/api-call.service"
 import { LoaderService } from "../../services/loader.service"
@@ -43,14 +43,16 @@ interface Product {
     heroShoppingBag,
     heroXMark,
     heroChevronLeft,   // <-- add
-  heroChevronRight
+    heroChevronRight,
+    heroDocumentText
   })]
 })
 export class ProductsComponent implements OnInit {
 
   Math = Math
   constructor(private apicall: ApiCallService,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private route: ActivatedRoute
   ) { }
 
   searchQuery = ''
@@ -75,9 +77,19 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit() {
     this.filteredProducts = [...this.allProducts]
-    this.loadcategories()
-    this.loadBrands()
-    this.fetchProducts();
+    this.loadcategories();
+    this.loadBrands();
+    this.initializeFilters();
+    this.route.queryParams.subscribe(params => {
+      if (params['brand']) {
+        this.selectedBrands = { [params['brand']]: true };
+      }
+      if (params['category']) {
+        this.selectedCategories = { [params['category']]: true };
+      }
+      this.fetchProducts();
+    });
+    
   }
 
   initializeFilters() {
@@ -154,8 +166,7 @@ export class ProductsComponent implements OnInit {
     this.apicall.GetcallWithoutToken('Category/GetCategorys').subscribe((response: any) => {
       if (response.responseCode === 200) {
         this.categories = response.data.map((item: any) => item.name);
-        this.brands = response.data.map((category: any) => category.brand).filter((brand: string, index: number, self: string[]) => self.indexOf(brand) === index);
-        this.initializeFilters();
+
         this.loader.hide();
       }
       else {
@@ -173,7 +184,7 @@ export class ProductsComponent implements OnInit {
     this.apicall.GetcallWithoutToken('Brand/GetBrands').subscribe((response: any) => {
       if (response.responseCode === 200) {
         this.brands = response.data.map((item: any) => item.name);
-        this.initializeFilters();
+
         this.loader.hide();
       } else {
         this.loader.hide();

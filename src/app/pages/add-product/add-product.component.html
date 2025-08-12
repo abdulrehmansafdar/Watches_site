@@ -92,7 +92,7 @@
                 </label>
                 <input type="text" formControlName="name" placeholder="Enter product name..."
                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
-                <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+                <div *ngIf="productForm.get('name')?.invalid && (productForm.get('name')?.touched || stepAttempted)"
                   class="mt-2 text-sm text-red-600">
                   Product name is required (minimum 3 characters)
                 </div>
@@ -108,7 +108,7 @@
                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"></textarea>
                 <div class="mt-2 flex justify-between text-sm">
                   <span
-                    *ngIf="productForm.get('shortDescription')?.invalid && productForm.get('shortDescription')?.touched"
+                    *ngIf="productForm.get('shortDescription')?.invalid && (productForm.get('shortDescription')?.touched || stepAttempted)"
                     class="text-red-600">Short description is required</span>
                   <span class="text-gray-500">{{ productForm.get('shortDescription')?.value?.length ||
                     0 }}/150</span>
@@ -117,15 +117,29 @@
 
               <!-- Category & Brand -->
               <div class="grid grid-cols-2 gap-4">
-                <custom-dropdown label="Category" placeholder="Select Category" dropdownName="Category"
-                  [selected]="productForm.get('Category')?.value" [required]="true"
-                  (select)="productForm.patchValue({ Category: $event })">
-                </custom-dropdown>
+                <div>
+                  <custom-dropdown label="Category" placeholder="Select Category" dropdownName="Category"
+                    [selected]="productForm.get('Category')?.value" [required]="true"
+                    (select)="productForm.patchValue({ Category: $event })">
+                  </custom-dropdown>
+                  <div
+                    *ngIf="(!productForm.get('Category')?.value) && (productForm.get('Category')?.touched || stepAttempted)"
+                    class="mt-2 text-sm text-red-600">
+                    Category is required
+                  </div>
+                </div>
 
-                <custom-dropdown label="Brand" placeholder="Select Brand" dropdownName="Brand"
-                  [selected]="productForm.get('Brand')?.value" [required]="true"
-                  (select)="productForm.patchValue({ Brand: $event })">
-                </custom-dropdown>
+                <div>
+                  <custom-dropdown label="Brand" placeholder="Select Brand" dropdownName="Brand"
+                    [selected]="productForm.get('Brand')?.value" [required]="true"
+                    (select)="productForm.patchValue({ Brand: $event })">
+                  </custom-dropdown>
+                  <div
+                    *ngIf="(!productForm.get('Brand')?.value) && (productForm.get('Brand')?.touched || stepAttempted)"
+                    class="mt-2 text-sm text-red-600">
+                    Brand is required
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -145,9 +159,14 @@
                       Price <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">RS</span>
+                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">PKR</span>
                       <input type="number" formControlName="price" placeholder="0.00"
-                        class="w-full pl-8 pr-4 py-3 border border-green-300 dark:border-green-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" />
+                        class="w-full pl-12 pr-4 py-3 border border-green-300 dark:border-green-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" />
+                    </div>
+                    <div
+                      *ngIf="(productForm.get('price')?.invalid && (productForm.get('price')?.touched || stepAttempted))"
+                      class="mt-2 text-sm text-red-600">
+                      Price is required
                     </div>
                   </div>
                   <div>
@@ -155,9 +174,9 @@
                       Original Price
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">RS</span>
+                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">PKR</span>
                       <input type="number" formControlName="originalPrice" placeholder="0.00"
-                        class="w-full pl-8 pr-4 py-3 border border-green-300 dark:border-green-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" />
+                        class="w-full pl-12 pr-4 py-3 border border-green-300 dark:border-green-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" />
                     </div>
                   </div>
                 </div>
@@ -165,7 +184,7 @@
                 <div *ngIf="calculateSavings() > 0" class="mt-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                   <div class="flex items-center justify-between text-sm">
                     <span class="text-green-700 dark:text-green-300">Customer Savings:</span>
-                    <span class="font-bold text-green-800 dark:text-green-200">RS {{
+                    <span class="font-bold text-green-800 dark:text-green-200">PKR {{
                       calculateSavings() }} ({{ getDiscountPercentage() }}%)</span>
                   </div>
                 </div>
@@ -190,7 +209,8 @@
             <textarea formControlName="description" rows="6"
               placeholder="Detailed product description, features, and benefits..."
               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"></textarea>
-            <div *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched"
+            <div
+              *ngIf="productForm.get('description')?.invalid && (productForm.get('description')?.touched || stepAttempted)"
               class="mt-2 text-sm text-red-600">
               Description is required (minimum 20 characters)
             </div>
@@ -223,12 +243,22 @@
                     [selected]="productForm.get('movement')?.value" [required]="true"
                     (select)="productForm.patchValue({ movement: $event })">
                   </custom-dropdown>
+                  <div
+                    *ngIf="(!productForm.get('movement')?.value) && (productForm.get('movement')?.touched || stepAttempted)"
+                    class="mt-2 text-sm text-red-600">
+                    Movement is required
+                  </div>
                 </div>
                 <div>
                   <custom-dropdown label="Material" placeholder="Select material" dropdownName="material"
                     [selected]="productForm.get('material')?.value" [required]="true"
                     [getOptionColor]="getMaterialColor" (select)="productForm.patchValue({ material: $event })">
                   </custom-dropdown>
+                  <div
+                    *ngIf="(!productForm.get('material')?.value) && (productForm.get('material')?.touched || stepAttempted)"
+                    class="mt-2 text-sm text-red-600">
+                    Material is required
+                  </div>
                 </div>
               </div>
 
@@ -239,10 +269,15 @@
                   </label>
                   <input type="text" formControlName="caseDiameter" placeholder="e.g., 42mm"
                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
+                  <div
+                    *ngIf="productForm.get('caseDiameter')?.invalid && (productForm.get('caseDiameter')?.touched || stepAttempted)"
+                    class="mt-2 text-sm text-red-600">
+                    Case diameter is required
+                  </div>
                 </div>
                 <div>
                   <custom-dropdown label="Water Resistance" placeholder="Select resistance" dropdownName="Resistance"
-                    [selected]="productForm.get('Resistance')?.value" [required]="true"
+                    [selected]="productForm.get('Resistance')?.value" [required]="false"
                     [getOptionDescription]="getResistanceDescription"
                     (select)="productForm.patchValue({ Resistance: $event })">
                   </custom-dropdown>
@@ -250,7 +285,7 @@
               </div>
 
               <!-- Features -->
-             
+
             </div>
 
             <!-- Advanced Specs -->
@@ -287,22 +322,22 @@
                 </div>
               </div>
 
-              
+
             </div>
-             <div class="w-[100%] col-span-2 inline-block">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Features
+            <div class="w-[100%] col-span-2 inline-block">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                Features
+              </label>
+              <div
+                class="grid md:grid-cols-6 grid-cols-3 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl p-4">
+                <label *ngFor="let feature of availableFeatures" class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" (change)="onFeatureChange($event, feature)"
+                    [checked]="featuresArray.value.includes(feature)"
+                    class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">{{ feature }}</span>
                 </label>
-                <div
-                  class="grid md:grid-cols-6 grid-cols-3 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl p-4">
-                  <label *ngFor="let feature of availableFeatures" class="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" (change)="onFeatureChange($event, feature)"
-                      [checked]="featuresArray.value.includes(feature)"
-                      class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded" />
-                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ feature }}</span>
-                  </label>
-                </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -348,6 +383,11 @@
                       </label>
                       <input type="number" formControlName="stockQuantity" placeholder="0"
                         class="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+                      <div
+                        *ngIf="productForm.get('stockQuantity')?.invalid && (productForm.get('stockQuantity')?.touched || stepAttempted)"
+                        class="mt-2 text-sm text-red-600">
+                        Stock quantity is required
+                      </div>
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
@@ -355,6 +395,10 @@
                       </label>
                       <input type="text" formControlName="sku" placeholder="Auto-generated"
                         class="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+                      <div *ngIf="productForm.get('sku')?.invalid && (productForm.get('sku')?.touched || stepAttempted)"
+                        class="mt-2 text-sm text-red-600">
+                        SKU is required
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -403,6 +447,11 @@
                 </label>
                 <input type="number" formControlName="warranty" placeholder="24"
                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" />
+                <div
+                  *ngIf="productForm.get('warranty')?.invalid && (productForm.get('warranty')?.touched || stepAttempted)"
+                  class="mt-2 text-sm text-red-600">
+                  Warranty period is required
+                </div>
               </div>
 
               <!-- Tags -->
@@ -575,13 +624,13 @@
           </div>
         </div>
       </div>
-      <button type="button" (click)="nextStep()" [disabled]="!validateCurrentStep()"
+      <button type="button" (click)="onNextStep()"
         class="inline-flex items-center px-6 py-3 bg-primary text-secondary rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-8">
         <span *ngIf="currentStep<totalSteps">Next Step</span>
         <span *ngIf="currentStep===totalSteps">Submit</span>
         <ng-icon name="heroArrowRight" class="w-4 h-4 ml-2"></ng-icon>
       </button>
-      
+
     </form>
   </div>
 </div>

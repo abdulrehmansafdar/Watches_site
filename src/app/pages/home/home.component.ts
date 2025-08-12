@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule } from "@angular/router"
+import { Router, RouterModule } from "@angular/router"
 import { FormsModule } from "@angular/forms"
 
 import { CartService } from "../../services/cart.service"
@@ -27,7 +27,7 @@ interface Collection {
   name: string
   image: string
   description: string
-  count?: number
+  link:string
 }
 interface WatchBrand {
   id: number;
@@ -160,19 +160,20 @@ export class HomeComponent implements OnInit {
     {
       name: "Luxury Heritage",
       image: "/assets/luxury.webp",
-      count: 5,
+      link:"Luxury",
+      
       description: "Timeless elegance meets traditional craftsmanship in our heritage collection."
     },
     {
       name: "Modern Sport",
       image: "/assets/sports.webp",
-      count: 3,
+      link:"Sport",
       description: "Built for performance, designed for style. Perfect for the active lifestyle."
     },
     {
       name: "Minimalist Chic",
       image: "/assets/mini.webp",
-      count: 4,
+      link:"Minimalist",
       description: "The pinnacle of horological excellence, featuring premium materials and complications."
     }
   ]
@@ -180,7 +181,8 @@ export class HomeComponent implements OnInit {
   currentSlides: { [key: string]: number } = {}
 
   constructor(private cartService: CartService,
-    private apicall: ApiCallService
+    private apicall: ApiCallService,
+    private router: Router
   ) {
     // Initialize current slides for each category
     this.categoryWatches.forEach(category => {
@@ -211,6 +213,13 @@ export class HomeComponent implements OnInit {
       this.currentSlides[categoryId] = Math.min(this.currentSlides[categoryId] + 1, maxSlide)
     }
   }
+  goToBrand(brand: string) {
+  this.router.navigate(['/products'], { queryParams: { brand } });
+}
+
+goToCategory(category: string) {
+  this.router.navigate(['/products'], { queryParams: { category } });
+}
 
   prevSlide(categoryId: string) {
     this.currentSlides[categoryId] = Math.max(0, this.currentSlides[categoryId] - 1)

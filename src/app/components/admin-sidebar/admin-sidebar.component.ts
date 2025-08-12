@@ -50,6 +50,7 @@ interface MenuItem {
     heroChevronDown,
     heroChevronRight,
     heroBell,
+    
     heroExclamationTriangle
   })]
 })
@@ -70,7 +71,7 @@ export class AdminSidebarComponent implements OnInit {
         {
           title: 'All Products',
           icon: 'heroSquares2x2',
-          route: '/admin-dashboard/products'
+          route: '/products'
         },
         {
           title: 'Add Product',
@@ -78,10 +79,10 @@ export class AdminSidebarComponent implements OnInit {
           route: '/admin-dashboard/add-product'
         },
         {
-          title: 'Manage Stock',
-          icon: 'heroArchiveBox',
-          route: '/admin-dashboard/stock-management',
-          badge: 5 // Low stock items count
+          // for managing categories and other things
+          title: 'Admin Settings',
+          icon: 'heroCog6Tooth',
+          route: '/admin-dashboard/admin-management',
         },
         {
           title: 'Featured Products',

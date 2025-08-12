@@ -9,9 +9,11 @@ import { CardComponent, CardContentComponent } from "../../components/card/card.
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { heroMinus, heroShare, heroStar } from '@ng-icons/heroicons/outline';
-import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh, ionCheckmarkCircle } from '@ng-icons/ionicons';
+import { ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag, ionAdd, ionShieldOutline, ionRefresh, ionCheckmarkCircle, } from '@ng-icons/ionicons';
 import { featherTruck } from "@ng-icons/feather-icons"
 import { ApiCallService } from "../../services/api-call.service"
+import { ThemeService } from "../../services/theme.service"
+import { Review } from "../../interfaces/interfaces.model"
 
 interface Product {
   id: number
@@ -33,15 +35,7 @@ interface Product {
   specifications: { [key: string]: string }
 }
 
-interface Review {
-  id: number
-  userId: number
-  userName: string
-  rating: number
-  date: string
-  comment: string
-  verified: boolean
-}
+
 
 
 @Component({
@@ -49,7 +43,7 @@ interface Review {
   imports: [CommonModule, RouterModule, FormsModule, CardComponent, CardContentComponent, NgIcon],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
-  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar,ionCheckmarkCircle})]
+  viewProviders: [provideIcons({ heroShare, ionGridOutline, ionFilter, ionList, ionStar, ionHeart,ionBag,heroMinus ,ionAdd,ionShieldOutline,featherTruck,ionRefresh,heroStar,ionCheckmarkCircle,})]
 })
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null
@@ -64,6 +58,7 @@ export class ProductDetailComponent implements OnInit {
 
   newReview = {
     rating: 0,
+    orderId: 0, // Add this
     userName: "",
     comment: "",
   }
@@ -78,7 +73,8 @@ export class ProductDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private cartService: CartService,
     private reviewService: ReviewService,
-    private apiService:ApiCallService
+    private apiService:ApiCallService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -189,17 +185,17 @@ export class ProductDetailComponent implements OnInit {
   submitReview() {
     if (this.isReviewValid() && this.product) {
       const review: Omit<Review, "id"> = {
-        userId: 1, // In a real app, this would be the current user's ID
+       
         userName: this.newReview.userName,
         rating: this.newReview.rating,
         date: new Date().toISOString().split("T")[0],
         comment: this.newReview.comment,
-        verified: false,
+      
       }
 
       this.reviewService.addReview(this.product.id, review).subscribe((newReview) => {
         this.reviews.unshift(newReview)
-        this.newReview = { rating: 0, userName: "", comment: "" }
+        this.newReview = { rating: 0,orderId: 0, userName: "", comment: "" }
         this.tabs[2].label = `Reviews (${this.reviews.length})`
       })
     }
@@ -209,4 +205,13 @@ export class ProductDetailComponent implements OnInit {
     // Implementation for loading more reviews
     this.hasMoreReviews = false
   }
+  copyUrl() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    // Optionally show a notification/toast here
+    // Example with alert:
+    // alert('Product link copied to clipboard!');
+    // Or use your notification service:
+    this.themeService.shownotification('Product link copied!', 'success');
+  });
+}
 }

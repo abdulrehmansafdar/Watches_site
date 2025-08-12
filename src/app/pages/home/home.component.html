@@ -38,16 +38,15 @@
 
     <!-- Brands Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-      <div *ngFor="let brand of watchBrands" 
-           class="group cursor-pointer">
-        <div class="bg-white rounded-2xl p-3 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200/60 dark:border-gray-700">
+      <div *ngFor="let brand of watchBrands" (click)="goToBrand(brand.name)" class="group cursor-pointer">
+        <div
+          class="bg-white rounded-2xl p-3 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200/60 dark:border-gray-700">
           <div class="flex items-center justify-center h-36">
-            <img [src]="brand.logo" 
-                 [alt]="brand.name" 
-                 class="max-h-full max-w-full object-contain filter group-hover:scale-110 transition-transform duration-300"
-                 loading="lazy" />
+            <img [src]="brand.logo" [alt]="brand.name"
+              class="max-h-full max-w-full object-contain filter group-hover:scale-110 transition-transform duration-300"
+              loading="lazy" />
           </div>
-          
+
         </div>
       </div>
     </div>
@@ -87,7 +86,7 @@
           <span>{{ offer.text }}</span>
         </div>
       </ng-container>
-      
+
       <!-- Duplicate for seamless scrolling -->
       <ng-container *ngFor="let offer of scrollingOffers">
         <div class="flex items-center space-x-3 text-sm font-medium">
@@ -113,9 +112,9 @@
     <!-- Category Carousels -->
     <div *ngFor="let category of categoryWatches" class="mb-16  ">
       <div class="flex items-center justify-between mb-8">
-        <h2 class="text-5xl font-semibold text-foreground">{{ category.category }}</h2>
+        <h2 class="text-3xl font-semibold text-foreground">{{ category.category }}</h2>
         <div class="flex items-center space-x-2">
-          <button (click)="scrollCarousel(category.id, 'left') " 
+          <button (click)="scrollCarousel(category.id, 'left') "
             class="hidden md:flex w-10 h-10 rounded-full border border-border hover:border-primary items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent">
             <ng-icon name="heroChevronLeft" class="w-5 h-5"></ng-icon>
           </button>
@@ -179,7 +178,8 @@
 
             <!-- Compact product information -->
             <div class="space-y-1">
-              <h3 class="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
+              <h3
+                class="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
                 {{ product.name }}
               </h3>
               <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
@@ -194,11 +194,11 @@
                   <span class="text-lg font-bold text-foreground">
                     ${{ product.price }}
                   </span>
-                  <span *ngIf="product.originalPrice" class="text-sm text-muted-foreground line-through">
+                  <span *ngIf="product.originalPrice && product.originalPrice>0" class="text-sm text-muted-foreground line-through">
                     ${{ product.originalPrice }}
                   </span>
                 </div>
-                <div *ngIf="product.originalPrice"
+                <div *ngIf="product.originalPrice && product.originalPrice>0"
                   class="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">
                   -{{ Math.round((1 - product.price / product.originalPrice) * 100) }}%
                 </div>
@@ -242,14 +242,13 @@
             <h3 class="text-2xl font-bold mb-2 group-hover:text-white transition-colors duration-300">
               {{ collection.name }}
             </h3>
-            <p class="text-sm opacity-90 mb-3 font-medium">{{ collection.count }}</p>
             <div class="w-12 h-1 bg-primary rounded-full group-hover:w-20 transition-all duration-500"></div>
           </div>
 
           <!-- Floating explore button -->
           <div
             class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500">
-            <button
+            <button (click)="goToCategory(collection.link)"
               class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-primary hover:scale-110 transition-all duration-300">
               <ng-icon name="heroArrowRight" class="w-5 h-5"></ng-icon>
             </button>
@@ -258,7 +257,7 @@
 
         <div class="space-y-4">
           <p class="text-muted-foreground leading-relaxed">{{ collection.description }}</p>
-          <button
+          <button (click)="goToCategory(collection.link)"
             class="inline-flex bg-secondary px-3 py-1 rounded-full items-center space-x-2 text-primary hover:text-primary/80 font-semibold text-sm group-hover:translate-x-2 transition-all duration-300">
             <span>Explore Collection</span>
             <ng-icon name="heroArrowRight"

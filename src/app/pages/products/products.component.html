@@ -172,15 +172,16 @@
                   <div class="flex items-baseline justify-between w-[100%]">
                     <span>
                       <span class="text-lg font-bold text-primary">${{ product.price }}</span>
-                      <span *ngIf="product.originalPrice" class="text-xs line-through text-muted-foreground ml-2">${{
+                      <span *ngIf="product.originalPrice&& product.originalPrice>0"
+                        class="text-xs line-through text-muted-foreground ml-2">${{
                         product.originalPrice }}</span>
                     </span>
-                    <span *ngIf="product.discount"
+                    <span *ngIf="product.discount && product.discount > 0"
                       class="ml-2 text-xs text-white bg-red-500 py-1 px-2 rounded-xl font-semibold">-{{
                       product.discount | number:'1.0-0' }}%</span>
                   </div>
                 </div>
-                
+
               </div>
             </ui-card-content>
           </ui-card>
@@ -265,87 +266,136 @@
                       <span class="text-2xl font-bold text-foreground">
                         ${{ product.price }}
                       </span>
-                      <span *ngIf="product.originalPrice" class="text-lg text-muted-foreground line-through">
+                      <span *ngIf="product.originalPrice && product.originalPrice>0"
+                        class="text-lg text-muted-foreground line-through">
                         ${{ product.originalPrice }}
                       </span>
                     </span>
-                    <span *ngIf="product.discount"
+                    <span *ngIf="product.discount && product.discount > 0"
                       class="ml-2 text-xs text-white bg-red-500 py-1 px-2 rounded-xl font-semibold">-{{
                       product.discount | number:'1.0-0' }}%</span>
                   </div>
                   <div *ngIf="product.features?.length" class="mt-2">
-                  <span class="text-xs text-muted-foreground">Features:</span>
-                  <div class="flex flex-wrap gap-2 mt-1">
-                    <span *ngFor="let feature of product.features" class="inline-block bg-muted px-2 py-1 rounded text-xs text-foreground">
-                      {{ feature }}
-                    </span>
+                    <span class="text-xs text-muted-foreground">Features:</span>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                      <span *ngFor="let feature of product.features"
+                        class="inline-block bg-muted px-2 py-1 rounded text-xs text-foreground">
+                        {{ feature }}
+                      </span>
+                    </div>
                   </div>
-                </div>
                 </div>
               </ui-card-content>
             </div>
           </ui-card>
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="flex items-center bg-muted justify-between mt-8 p-8 rounded-2xl" *ngIf="totalRecords > 0">
-          <div>
-            <span class="text-sm text-muted-foreground">
-              Showing {{ ((pageNumber - 1) * pageSize) + 1 }} -
-              {{ Math.min(pageNumber * pageSize, totalRecords) }} of {{ totalRecords }} products
-            </span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <!-- Prev Button -->
-            <button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber === 1"
-              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white disabled:opacity-40 flex items-center disabled:cursor-not-allowed">
-              <ng-icon name="heroChevronLeft" class="w-4 h-4 mr-1"></ng-icon>
-              Prev
-            </button>
+        <!-- Unified Pagination Controls -->
+        <div class="mt-12" *ngIf="totalRecords > 0">
+          <div
+            class="bg-gradient-to-r from-muted/50 to-muted/30 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg">
 
-            <!-- First Page -->
-            <button *ngIf="pageNumber > 3" (click)="changePage(1)"
-              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white"
-              [class.bg-primary]="pageNumber === 1" [class.text-white]="pageNumber === 1"
-              [class.font-bold]="pageNumber === 1">1</button>
-            <span *ngIf="pageNumber > 4" class="px-2 text-muted-foreground">...</span>
+            <!-- Top Section: Results Summary & Page Size -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 ">
+              <!-- Results Summary -->
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center justify-center w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl">
+                  <ng-icon name="heroDocumentText" class="w-6 h-6 text-primary"></ng-icon>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-muted-foreground">Showing Results</p>
+                  <p class="text-lg font-bold text-foreground">
+                    {{ ((pageNumber - 1) * pageSize) + 1 }} - {{ Math.min(pageNumber * pageSize, totalRecords) }}
+                    <span class="text-muted-foreground font-normal">of {{ totalRecords }} products</span>
+                  </p>
+                </div>
+              </div>
+               <!-- Navigation Controls -->
+              <div class="flex items-center justify-center sm:justify-start flex-wrap gap-2">
 
-            <!-- Page Numbers Around Current -->
-            <ng-container *ngFor="let p of [].constructor(totalPages); let i = index">
-              <button *ngIf="i + 1 >= pageNumber - 2 && i + 1 <= pageNumber + 2" (click)="changePage(i + 1)"
-                class="px-3 py-2 rounded-full border border-border bg-secondary text-foreground shadow transition-all duration-200 hover:bg-seconday hover:text-primary mx-1"
-                [class.bg-primary]="pageNumber === (i + 1)"[class.text-white]="pageNumber === (i + 1)" 
-                [class.font-bold]="pageNumber === (i + 1)" [class.shadow-lg]="pageNumber === (i + 1)">
-                {{ i + 1 }}
-              </button>
-            </ng-container>
+                <!-- Previous Button -->
+                <button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber === 1"
+                  class="group flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-border bg-background hover:bg-primary hover:border-primary text-foreground hover:text-white shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:border-border">
+                  <ng-icon name="heroChevronLeft"
+                    class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5"></ng-icon>
+                  <span class="text-sm font-medium">Previous</span>
+                </button>
 
-            <!-- Ellipsis and Last Page -->
-            <span *ngIf="pageNumber < totalPages - 3" class="px-2 text-muted-foreground">...</span>
-            <button *ngIf="pageNumber < totalPages - 2" (click)="changePage(totalPages)"
-              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white"
-              [class.bg-primary]="pageNumber === totalPages" [class.text-white]="pageNumber === totalPages"
-              [class.font-bold]="pageNumber === totalPages">
-              {{ totalPages }}
-            </button>
+                <!-- First Page & Ellipsis -->
+                <ng-container *ngIf="pageNumber > 3">
+                  <button (click)="changePage(1)"
+                    class="w-10 h-10 rounded-xl border border-border bg-background hover:bg-primary hover:border-primary text-foreground hover:text-white shadow-sm transition-all duration-200 flex items-center justify-center text-sm font-medium">
+                    1
+                  </button>
+                  <span *ngIf="pageNumber > 4" class="flex items-center justify-center w-8 h-10 text-muted-foreground">
+                    <ng-icon name="heroEllipsisHorizontal" class="w-5 h-5"></ng-icon>
+                  </span>
+                </ng-container>
 
-            <!-- Next Button -->
-            <button (click)="changePage(pageNumber + 1)" [disabled]="pageNumber * pageSize >= totalRecords"
-              class="px-3 py-2 rounded-full border border-border bg-background text-foreground shadow transition-all duration-200 hover:bg-primary hover:text-white disabled:opacity-40 flex items-center disabled:cursor-not-allowed">
-              Next
-              <ng-icon name="heroChevronRight" class="w-4 h-4 ml-1"></ng-icon>
-            </button>
+                <!-- Page Numbers -->
+                <ng-container *ngFor="let p of [].constructor(totalPages); let i = index">
+                  <button *ngIf="i + 1 >= pageNumber - 2 && i + 1 <= pageNumber + 2" (click)="changePage(i + 1)"
+                    class="w-10 h-10 rounded-xl border transition-all duration-200 flex items-center justify-center text-sm font-medium shadow-sm hover:scale-105"
+                    [class]="pageNumber === (i + 1) 
+              ? 'bg-primary border-primary text-white dark:text-black shadow-lg shadow-primary/25' 
+              : 'border-border bg-background hover:bg-primary hover:border-primary text-foreground hover:text-white'">
+                    {{ i + 1 }}
+                  </button>
+                </ng-container>
 
-            <!-- Page Size Selector -->
-            <div class="flex items-center space-x-2">
-              <label class="text-sm font-medium text-muted-foreground">Items per page:</label>
-              <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)"
-                class="border border-border rounded-lg bg-background text-foreground px-3 py-2 text-sm shadow-sm hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 cursor-pointer">
-                <option [value]="8">8 items</option>
-                <option [value]="16">16 items</option>
-                <option [value]="32">32 items</option>
-                <option [value]="64">64 items</option>
-              </select>
+                <!-- Last Page & Ellipsis -->
+                <ng-container *ngIf="pageNumber < totalPages - 2">
+                  <span *ngIf="pageNumber < totalPages - 3"
+                    class="flex items-center justify-center w-8 h-10 text-muted-foreground">
+                    <ng-icon name="heroEllipsisHorizontal" class="w-5 h-5"></ng-icon>
+                  </span>
+                  <button (click)="changePage(totalPages)"
+                    class="w-10 h-10 rounded-xl border border-border bg-background hover:bg-primary hover:border-primary text-foreground hover:text-white shadow-sm transition-all duration-200 flex items-center justify-center text-sm font-medium">
+                    {{ totalPages }}
+                  </button>
+                </ng-container>
+
+                <!-- Next Button -->
+                <button (click)="changePage(pageNumber + 1)" [disabled]="pageNumber * pageSize >= totalRecords"
+                  class="group flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-border bg-background hover:bg-primary hover:border-primary text-foreground hover:text-white shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:border-border">
+                  <span class="text-sm font-medium">Next</span>
+                  <ng-icon name="heroChevronRight"
+                    class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"></ng-icon>
+                </button>
+              </div>
+
+              <!-- Page Size Selector -->
+              <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                  <ng-icon name="heroRectangleStack" class="w-4 h-4 text-muted-foreground"></ng-icon>
+                  <label class="text-sm font-medium text-muted-foreground">Show:</label>
+                </div>
+                <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)"
+                  class="bg-background dark:bg-gray-800 border border-border rounded-xl px-4 py-2.5 text-sm font-medium text-foreground shadow-sm hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 cursor-pointer min-w-[120px]">
+                  <option [value]="8">8 items</option>
+                  <option [value]="16">16 items</option>
+                  <option [value]="32">32 items</option>
+                  <option [value]="64">64 items</option>
+                </select>
+              </div>
+            </div>
+
+           
+
+            <!-- Bottom Section: Navigation Controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+              <!-- Mobile Page Info -->
+              <div class="sm:hidden text-center">
+                <span class="text-sm text-muted-foreground">
+                  Page {{ pageNumber }} of {{ totalPages }}
+                </span>
+              </div>
+
+             
+
+             
+              
             </div>
           </div>
         </div>

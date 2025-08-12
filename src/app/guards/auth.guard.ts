@@ -34,6 +34,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   );
   }
   // If not in browser, allow access
-  return of(true);
+  return of(false);
   
 };
