@@ -83,8 +83,6 @@ interface Order {
     CommonModule, 
     RouterModule, 
     BaseChartDirective, 
-    CardComponent, 
-    CardContentComponent, 
     NgIcon
   ],
   templateUrl: './dashboard.component.html',

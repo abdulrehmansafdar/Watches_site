@@ -1,6 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID } from "@angular/core"
 import { BehaviorSubject } from "rxjs"
 import { isPlatformBrowser } from "@angular/common"
+import { ThemeService } from "./theme.service"
+import { Router } from "@angular/router"
 
 export interface CartItem {
   id: number
@@ -20,7 +22,9 @@ export class CartService {
   cartItems$ = this.cartItems.asObservable()
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private themeService: ThemeService,
+    private router: Router
   ) {
     this.loadCartFromStorage()
   }
@@ -47,6 +51,9 @@ export class CartService {
     if (existingItem) {
       existingItem.quantity += 1
     } else {
+      this.themeService.showCartToast("Item added to cart", () => {
+        this.router.navigate(['/cart']); // Use Angular Router
+      });
       currentItems.push({ ...item, quantity: 1 })
     }
 

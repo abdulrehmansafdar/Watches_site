@@ -55,4 +55,46 @@ export class ThemeService {
       confirmButtonText: 'OK'
     });
   }
+  confirmationModal(type: string, onConfirm: () => void) {
+    Swal.fire({
+      theme: this.isDarkMode.value ? 'dark' : 'light',
+      title: `Are you sure to delete ${type}?`,
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onConfirm();
+       
+      }
+    });
+  }
+  showCartToast(message: string, onViewCart?: () => void) {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: message,
+    showConfirmButton: true,
+    confirmButtonText: 'View Cart',
+    timer: 5000,
+    timerProgressBar: true,
+    background: this.isDarkMode.value ? '#222' : '#fff',
+    color: this.isDarkMode.value ? '#fff' : '#222',
+    customClass: {
+      popup: 'swal2-cart-toast'
+    },
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  }).then((result) => {
+    if (result.isConfirmed && onViewCart) {
+      onViewCart();
+    }
+  });
+}
 }
